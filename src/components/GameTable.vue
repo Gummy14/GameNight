@@ -167,7 +167,6 @@ export default {
       firebase.firestore().collection('root').doc('game-room').update({ deck: deck })
     },
     startGame () {
-      console.log('startGame')
       this.assignRoles()
       this.restoreDeck()
     },
@@ -183,7 +182,7 @@ export default {
     assignRoles () {
       var roleSet = []
       var playerRole = {
-        role: 'None',
+        isHitler: false,
         party: 'None'
       }
       this.crowd.forEach(() => {
@@ -217,23 +216,23 @@ export default {
         roleSet[i] = roleSet[pick]
         roleSet[pick] = temp
       }
-      this.crowd.forEach((element, index) => {
-        this.crowd[index].role = roleSet[index].role
-        this.crowd[index].party = roleSet[index].party
+      this.crowd.forEach((element, i) => {
+        this.crowd[i].isHitler = roleSet[i].isHitler
+        this.crowd[i].party = roleSet[i].party
       })
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     },
     createRoleSet(roleSet, numberOfLiberals, numberOfFascists) {
       var hitlerRole = {
-        role: 'Hitler',
+        isHitler: true,
         party: 'Fascist'
       }
       var fascistRole = {
-        role: 'Fascist',
+        isHitler: false,
         party: 'Fascist'
       }
       var liberalRole = {
-        role: 'Liberal',
+        isHitler: false,
         party: 'Liberal'
       }
       roleSet.splice(0, 1, hitlerRole)

@@ -81,7 +81,7 @@ export default {
               username: currentUser.displayName,
               userId: currentUser.uid,
               email: currentUser.email,
-              role: 'None',
+              isHitler: false,
               party: 'None',
               office: 'None'
             }
