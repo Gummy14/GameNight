@@ -6,12 +6,12 @@
         accordion
       >
       <template v-for="(user, index) in crowd">
-      <v-expansion-panel class="panel" ripple :key="user.userId">
-        <v-expansion-panel-header>{{ user.username }}</v-expansion-panel-header>
-        <v-expansion-panel-content>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-      <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
+        <v-expansion-panel ripple :key="user.userId">
+          <v-expansion-panel-header :class="applyOffice(user.office)"> {{ user.username }} </v-expansion-panel-header>
+          <v-expansion-panel-content>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
       </template>
     </v-expansion-panels>
     </v-card>
@@ -153,6 +153,12 @@ export default {
         'liberal': policyType === 1
       }
     },
+    applyOffice (office) {
+      return {
+        'president': office === 'President',
+        'chancellor': office === 'Chancellor'
+      }
+    },
     addFascistPolicy () {
       firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
     },
@@ -167,8 +173,13 @@ export default {
       firebase.firestore().collection('root').doc('game-room').update({ deck: deck })
     },
     startGame () {
+      var pick = Math.floor(Math.random() * (this.crowd.length + 1))
       this.assignRoles()
       this.restoreDeck()
+      for (var x = 0; x < this.crowd.length; x++) {
+        this.crowd[x].office = 'None'
+      }
+      this.changePresident(pick)
     },
     randomizeDeck () {
       for (var i = this.defaultDeck.length - 1; i > 0; i--) {
@@ -178,6 +189,16 @@ export default {
         this.defaultDeck[pick] = temp
       }
       return this.defaultDeck
+    },
+    changePresident (player) {
+      if (player > 0) {
+        this.crowd[player-1].office = 'None'
+      } else if (player === 0) {
+        var lastPlayer = this.crowd.length - 1
+        this.crowd[lastPlayer].office = 'None'
+      }
+      this.crowd[player].office = 'President'
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     },
     assignRoles () {
       var roleSet = []
@@ -275,7 +296,9 @@ export default {
 .liberal{
   background: blue;
 }
-
+.president {
+  color: yellow;
+}
 .fascist-board {
   height: 125px;
   display: flex;
