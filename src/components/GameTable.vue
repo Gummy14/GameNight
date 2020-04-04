@@ -123,7 +123,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck' })
+    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user' })
   },
   mounted () {
     var self = this
@@ -198,6 +198,17 @@ export default {
         this.crowd[lastPlayer].office = 'None'
       }
       this.crowd[player].office = 'President'
+      if (this.crowd[player].userId === this.user.userId) {
+        this.user.office = 'President'
+        this.$store.commit('setUser', {
+              User: this.user
+            })
+      } else if (this.crowd[player].userId !== this.user.userId) {
+        this.user.office = 'None'
+        this.$store.commit('setUser', {
+              User: this.user
+            })
+      }
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     },
     assignRoles () {
