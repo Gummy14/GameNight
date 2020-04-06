@@ -56,8 +56,8 @@
         </div>
 
         <v-btn class="start-button" @click="startGame">START GAME</v-btn>
-        <v-card-title class="title">Your Policies</v-card-title>
-          <div class="board player-hand" v-if="user.office === 'President'">
+        <v-card-title class="title">Player Board</v-card-title>
+          <div v-if="user.office === 'President'" class="board player-hand">
             <v-card class="card-hand">
               <draggable class="hand" :list="hand" group="cards">
                 <v-card
@@ -68,8 +68,9 @@
                 </v-card>
               </draggable>
             </v-card>
-            <player-card class="float-right"> </player-card>
+            <player-card class="player-card"> </player-card>
           </div>
+          <player-card v-else class="player-hand player-card"> </player-card>
       </div>
       
       <div class="small-board">
@@ -295,6 +296,11 @@ export default {
       this.crowd.forEach((element, i) => {
         this.crowd[i].isHitler = roleSet[i].isHitler
         this.crowd[i].party = roleSet[i].party
+        if (this.crowd[i].userId === this.user.userId) {
+          this.$store.commit('setUser', {
+            User: this.crowd[i]
+          })
+        }
       })
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     },
@@ -422,5 +428,9 @@ export default {
 }
 .space {
   padding-left: 15px;
+}
+.player-card {
+  margin-left: 10px;
+  width: 270px;
 }
 </style>

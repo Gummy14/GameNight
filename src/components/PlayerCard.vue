@@ -1,13 +1,16 @@
 <template>
   <v-card>
-    Blahblahblah
+    {{ user.username}}, {{ user.party }}
   </v-card>
 </template>
 
 <script>
-// import firebase from 'firebase'
+import { mapState } from 'vuex'
 export default {
-    name: 'player-card'
+  name: 'player-card',
+  computed: {
+    ...mapState({ user: 'user'})
+  }
 }
 </script>
 <style scoped>
