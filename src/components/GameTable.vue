@@ -11,12 +11,11 @@
             {{ player.username }}
             <v-spacer></v-spacer>
             <div v-if="player.office != 'President'">
-            <v-btn v-if="user.office === 'President'" @click="nominateChancellor(player)"></v-btn>
+            <v-btn v-if="user.office === 'President'" @click="nominateChancellor(index)"></v-btn>
             </div>
           </v-list-item>
       </v-list>
     </v-card>
-
 
     <div class="table">
       <div class="small-board">
@@ -57,19 +56,20 @@
         </div>
 
         <v-btn class="start-button" @click="startGame">START GAME</v-btn>
-        <div class="board" v-if="user.office === 'President'">
-          <v-card-title class="title">Your Policies</v-card-title>
-          <v-card class="card-hand">
-            <draggable class="hand" :list="hand" group="cards">
-              <v-card
-                :class="applyClass(element.type)"
-                v-for="(element) in hand"
-                :key="element.id"
-              >
-              </v-card>
-            </draggable>
-          </v-card>
-        </div>
+        <v-card-title class="title">Your Policies</v-card-title>
+          <div class="board player-hand" v-if="user.office === 'President'">
+            <v-card class="card-hand">
+              <draggable class="hand" :list="hand" group="cards">
+                <v-card
+                  :class="applyClass(element.type)"
+                  v-for="(element) in hand"
+                  :key="element.id"
+                >
+                </v-card>
+              </draggable>
+            </v-card>
+            <player-card class="float-right"> </player-card>
+          </div>
       </div>
       
       <div class="small-board">
@@ -85,7 +85,6 @@
         <v-btn @click="restoreDeck">Restore</v-btn>
       </div>
     </div>
-    
   </div>
 </template>
 
@@ -93,10 +92,12 @@
 import firebase from 'firebase'
 import draggable from 'vuedraggable'
 import { mapState } from 'vuex'
+import PlayerCard from './PlayerCard'
 export default {
   name: 'game-table',
   components: {
     draggable,
+    PlayerCard
   },
   data() {
     return {
@@ -161,7 +162,8 @@ export default {
     applyOffice (office) {
       return {
         'president': office === 'President',
-        'chancellor': office === 'Chancellor'
+        'chancellor': office === 'Chancellor',
+        'chancellor-nominee': office === 'Chancellor Nominee'
       }
     },
     addFascistPolicy () {
@@ -199,7 +201,16 @@ export default {
       this.changePresident()
     },
     nominateChancellor (nominee) {
-      firebase.firestore().collection('root').doc('game-room').update({ chancellorNominee: nominee })
+      this.clearChancellorNominee()
+      this.crowd[nominee].office = 'Chancellor Nominee'
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+    },
+    clearChancellorNominee () {
+      for (let x=0; x < this.crowd.length; x++) {
+        if (this.crowd[x].office != 'President') {
+          this.crowd[x].office = 'None'
+        }
+      }
     },
     changePresident (oldPres) {
       var lastPlayer = this.crowd.length
@@ -344,6 +355,12 @@ export default {
   color: yellow;
   background: rebeccapurple;
 }
+.chancellor {
+  background: orange 50%;
+}
+.chancellor-nominee {
+  background: #ff2a54;
+}
 .fascist-board {
   height: 125px;
   display: flex;
@@ -356,7 +373,10 @@ export default {
   width: 550px;
   padding: 10px;
 }
-
+.player-hand {
+  padding: 10px;
+  display: flex;
+}
 .hand {
   height: 125px;
   display: flex;
