@@ -403,7 +403,4 @@ export default {
 .space {
   padding-left: 15px;
 }
-.ifPresident {
-  display:none;
-}
 </style>
