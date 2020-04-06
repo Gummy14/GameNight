@@ -1,19 +1,20 @@
 <template>
   <div>
     <v-card class="login">
-      <v-card-title>Current Players</v-card-title>
-      <v-expansion-panels
-        accordion
-      >
-      <template v-for="(user, index) in crowd">
-        <v-expansion-panel ripple :key="user.userId">
-          <v-expansion-panel-header :class="applyOffice(user.office)"> {{ user.username }} </v-expansion-panel-header>
-          <v-expansion-panel-content>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-        <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
-      </template>
-    </v-expansion-panels>
+      <v-list>
+        <v-subheader class="space">PLAYERS</v-subheader>
+          <v-list-item
+            v-for="(player, index) in crowd"
+            :key="index"
+            :class="applyOffice(player.office)" 
+          > 
+            {{ player.username }}
+            <v-spacer></v-spacer>
+            <div v-if="player.office != 'President'">
+            <v-btn v-if="user.office === 'President'" @click="nominateChancellor(player)"></v-btn>
+            </div>
+          </v-list-item>
+      </v-list>
     </v-card>
 
 
@@ -56,7 +57,7 @@
         </div>
 
         <v-btn class="start-button" @click="startGame">START GAME</v-btn>
-        <div class="board">
+        <div class="board" v-if="user.office === 'President'">
           <v-card-title class="title">Your Policies</v-card-title>
           <v-card class="card-hand">
             <draggable class="hand" :list="hand" group="cards">
@@ -123,7 +124,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user' })
+    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user', nominee: 'chancellorNominee'})
   },
   mounted () {
     var self = this
@@ -142,6 +143,10 @@ export default {
 
       self.$store.commit('setDeck', {
         Deck: doc.data().deck
+      })
+
+      self.$store.commit('setChancellorNominee', {
+        ChancellorNominee: doc.data().chancellorNominee
       })
     })
   },
@@ -173,13 +178,13 @@ export default {
       firebase.firestore().collection('root').doc('game-room').update({ deck: deck })
     },
     startGame () {
-      var pick = Math.floor(Math.random() * (this.crowd.length + 1))
       this.assignRoles()
       this.restoreDeck()
       for (var x = 0; x < this.crowd.length; x++) {
         this.crowd[x].office = 'None'
       }
-      this.changePresident(pick)
+      var pick = Math.floor(Math.random() * (this.crowd.length + 1))
+      this.pickPresident(pick)
     },
     randomizeDeck () {
       for (var i = this.defaultDeck.length - 1; i > 0; i--) {
@@ -190,7 +195,35 @@ export default {
       }
       return this.defaultDeck
     },
-    changePresident (player) {
+    newTurn () {
+      this.changePresident()
+    },
+    nominateChancellor (nominee) {
+      firebase.firestore().collection('root').doc('game-room').update({ chancellorNominee: nominee })
+    },
+    changePresident (oldPres) {
+      var lastPlayer = this.crowd.length
+      if (oldPres > 0) {
+        this.crowd[oldPres].office = 'None'
+      } else if (oldPres == lastPlayer) {
+        this.crowd[0].office = 'President'
+      }
+      var newPres = this.crowd[oldPres] + 1
+      this.crowd[newPres].office = 'President'
+      if (this.crowd[oldPres].userId === this.user.userId) {
+        this.user.office = 'President'
+        this.$store.commit('setUser', {
+              User: this.user
+            })
+      } else if (this.crowd[oldPres].userId !== this.user.userId) {
+        this.user.office = 'None'
+        this.$store.commit('setUser', {
+              User: this.user
+            })
+      }
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+    },
+    pickPresident (player) {
       if (player > 0) {
         this.crowd[player-1].office = 'None'
       } else if (player === 0) {
@@ -285,7 +318,7 @@ export default {
 <style scoped>
 .login {
   margin: 20px;
-  max-width: 350px;
+  max-width: 250px;
 }
 
 .table {
@@ -309,6 +342,7 @@ export default {
 }
 .president {
   color: yellow;
+  background: rebeccapurple;
 }
 .fascist-board {
   height: 125px;
@@ -365,5 +399,11 @@ export default {
   left: 50%;
   margin-right: -50%;
   transform: translate(-50%);
+}
+.space {
+  padding-left: 15px;
+}
+.ifPresident {
+  display:none;
 }
 </style>
