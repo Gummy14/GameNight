@@ -150,6 +150,10 @@ export default {
       self.$store.commit('setChancellorNominee', {
         ChancellorNominee: doc.data().chancellorNominee
       })
+
+      self.$store.commit('setVotes', {
+        Votes: doc.data().votes
+      })
     })
   },
   methods: {
