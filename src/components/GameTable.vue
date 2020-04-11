@@ -56,7 +56,7 @@
         </div>
 
         <v-btn class="start-button" @click="startGame">START GAME</v-btn>
-        <h3 v-if="chancellorNominee != ''">The President has nominated {{ chancellorNominee.username }} for Chancellor</h3>
+        <h3> The President has nominated {{ chancellorNominee }} for Chancellor</h3>
         <v-card-title class="title">Player Board</v-card-title>
           <div v-if="user.office === 'President'" class="board player-hand">
             <v-card class="card-hand">
@@ -129,12 +129,19 @@ export default {
   computed: {
     ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user'}),
     chancellorNominee () {
+      var doesChancellorNomineeExist = false
+      var chancellorNominee = ''
       this.crowd.forEach(element => {
         if (element.office === 'Chancellor Nominee') {
-          return element.username
+          doesChancellorNomineeExist = true
+          chancellorNominee = element.username
         }
       })
-      return ''
+      if (doesChancellorNomineeExist === false) {
+        return ''
+      } else {
+        return chancellorNominee
+      }
     }
   },
   mounted () {
@@ -156,17 +163,6 @@ export default {
         Deck: doc.data().deck
       })
 
-      self.$store.commit('setChancellorNominee', {
-        ChancellorNominee: doc.data().chancellorNominee
-      })
-
-      if (doc.data().election.length === doc.data().crowd.length) {
-        self.countVotes()
-      } else if (doc.data().election.length < doc.data().crowd.length) {
-        self.$store.commit('setElection', {
-          Election: doc.data().election
-        })
-      }
     })
   },
   methods: {

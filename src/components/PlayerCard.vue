@@ -40,7 +40,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({ user: 'user', election: 'election'}),
+    ...mapState({ user: 'user', crowd: 'crowd'}),
     isHitler() {
         if (this.user.isHitler === true) {
             return 'You are Hitler'
@@ -51,9 +51,15 @@ export default {
   },
   methods: {
     vote(ballot) {
-      this.election.push(ballot)
-      firebase.firestore().collection('root').doc('game-room').update({ election: this.election })
-      this.didVote = true
+        for (let x = 0; x < this.crowd.length; x++) {
+            if (this.user.userId === this.crowd[x].userId) {
+              console.log(this.crowd[x])
+              this.crowd[x].vote = ballot
+              console.log(this.crowd[x])
+          }
+          firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+          break
+        }
     }
   }
 }
