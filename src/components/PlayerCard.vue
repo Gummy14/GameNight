@@ -22,8 +22,8 @@
                 
         </v-list-item>
         <v-card-actions>
-            <v-btn>Vote Ja!</v-btn>
-            <v-btn>Vote Nein!</v-btn>
+            <v-btn :disabled="didVote" @click="vote(true)">Vote Ja!</v-btn>
+            <v-btn :disabled="didVote" @click="vote(false)">Vote Nein!</v-btn>
         </v-card-actions>
     </div>
   </v-card>
@@ -31,16 +31,29 @@
 
 <script>
 import { mapState } from 'vuex'
+import firebase from 'firebase'
 export default {
   name: 'player-card',
+  data() {
+    return {
+      didVote: false
+    };
+  },
   computed: {
-    ...mapState({ user: 'user'}),
+    ...mapState({ user: 'user', election: 'election'}),
     isHitler() {
         if (this.user.isHitler === true) {
             return 'You are Hitler'
         } else {
             return 'You are not Hitler'
         }
+    }
+  },
+  methods: {
+    vote(ballot) {
+      this.election.push(ballot)
+      firebase.firestore().collection('root').doc('game-room').update({ election: this.election })
+      this.didVote = true
     }
   }
 }

@@ -10,7 +10,7 @@ export default new Vuex.Store({
     fascistBoard: [],
     liberalBoard: [],
     deck: [],
-    chancellorNominee: ''
+    election: []
   },
   mutations: {
     setUser (state, payload) {
@@ -28,8 +28,8 @@ export default new Vuex.Store({
     setDeck (state, payload) {
       state.deck = payload.Deck
     },
-    setChancellorNominee (state, payload) {
-      state.chancellorNominee = payload.ChancellorNominee
+    setElection (state, payload) {
+      state.election = payload.Election
     },
     clearStore (state) {
       state.user = undefined,
@@ -37,7 +37,7 @@ export default new Vuex.Store({
       state.fascistBoard = [],
       state.liberalBoard = [],
       state.deck = [],
-      state.chancellorNominee = ''
+      state.election = []
     }
   },
   actions: {
@@ -58,8 +58,8 @@ export default new Vuex.Store({
     getDeck (state) {
       return state.deck
     },
-    getChancellorNominee (state) {
-      return state.chancellorNominee
+    getElection (state) {
+      return state.election
     }
   }
 })

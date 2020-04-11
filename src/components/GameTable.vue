@@ -11,7 +11,7 @@
             {{ player.username }}
             <v-spacer></v-spacer>
             <div v-if="player.office != 'President'">
-            <v-btn v-if="user.office === 'President'" @click="nominateChancellor(index)"></v-btn>
+              <v-btn v-if="user.office === 'President'" @click="nominateChancellor(index)"></v-btn>
             </div>
           </v-list-item>
       </v-list>
@@ -56,6 +56,7 @@
         </div>
 
         <v-btn class="start-button" @click="startGame">START GAME</v-btn>
+        <h3 v-if="chancellorNominee != ''">The President has nominated {{ chancellorNominee.username }} for Chancellor</h3>
         <v-card-title class="title">Player Board</v-card-title>
           <div v-if="user.office === 'President'" class="board player-hand">
             <v-card class="card-hand">
@@ -126,7 +127,15 @@ export default {
     };
   },
   computed: {
-    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user', nominee: 'chancellorNominee'})
+    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user'}),
+    chancellorNominee () {
+      this.crowd.forEach(element => {
+        if (element.office === 'Chancellor Nominee') {
+          return element.username
+        }
+      })
+      return ''
+    }
   },
   mounted () {
     var self = this
@@ -150,6 +159,14 @@ export default {
       self.$store.commit('setChancellorNominee', {
         ChancellorNominee: doc.data().chancellorNominee
       })
+
+      if (doc.data().election.length === doc.data().crowd.length) {
+        self.countVotes()
+      } else if (doc.data().election.length < doc.data().crowd.length) {
+        self.$store.commit('setElection', {
+          Election: doc.data().election
+        })
+      }
     })
   },
   methods: {
