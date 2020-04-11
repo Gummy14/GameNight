@@ -160,7 +160,6 @@ export default {
         ChancellorNominee: doc.data().chancellorNominee
       })
 
-<<<<<<< HEAD
       if (doc.data().election.length === doc.data().crowd.length) {
         self.countVotes()
       } else if (doc.data().election.length < doc.data().crowd.length) {
@@ -168,11 +167,6 @@ export default {
           Election: doc.data().election
         })
       }
-=======
-      self.$store.commit('setVotes', {
-        Votes: doc.data().votes
-      })
->>>>>>> 658299698ce1da855db4e1d7bff22de5495fba03
     })
   },
   methods: {

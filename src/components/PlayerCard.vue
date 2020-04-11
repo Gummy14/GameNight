@@ -22,13 +22,8 @@
                 
         </v-list-item>
         <v-card-actions>
-<<<<<<< HEAD
             <v-btn :disabled="didVote" @click="vote(true)">Vote Ja!</v-btn>
             <v-btn :disabled="didVote" @click="vote(false)">Vote Nein!</v-btn>
-=======
-            <v-btn @click="voteFunction(true)">Vote Ja!</v-btn>
-            <v-btn @click="voteFunction(false)">Vote Nein!</v-btn>
->>>>>>> 658299698ce1da855db4e1d7bff22de5495fba03
         </v-card-actions>
     </div>
   </v-card>
@@ -55,19 +50,13 @@ export default {
     }
   },
   methods: {
-<<<<<<< HEAD
     vote(ballot) {
       this.election.push(ballot)
       firebase.firestore().collection('root').doc('game-room').update({ election: this.election })
       this.didVote = true
     }
-=======
-      voteFunction (vote) {
-              firebase.firestore().collection('root').doc('game-room').update({ votes: vote })
-          } 
-      }
->>>>>>> 658299698ce1da855db4e1d7bff22de5495fba03
   }
+}
 </script>
 <style scoped>
 .policy {
