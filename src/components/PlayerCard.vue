@@ -51,15 +51,13 @@ export default {
   },
   methods: {
     vote(ballot) {
-        for (let x = 0; x < this.crowd.length; x++) {
-            if (this.user.userId === this.crowd[x].userId) {
-              console.log(this.crowd[x])
-              this.crowd[x].vote = ballot
-              console.log(this.crowd[x])
+        for (let i = 0; i < this.crowd.length; i++) {
+            if (this.user.userId === this.crowd[i].userId) {
+              this.crowd[i].vote = ballot
+              break
           }
-          firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
-          break
         }
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     }
   }
 }
