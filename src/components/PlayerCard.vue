@@ -22,8 +22,8 @@
                 
         </v-list-item>
         <v-card-actions>
-            <v-btn :disabled="didVote" @click="vote(true)">Vote Ja!</v-btn>
-            <v-btn :disabled="didVote" @click="vote(false)">Vote Nein!</v-btn>
+            <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(true)">Vote Ja!</v-btn>
+            <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
         </v-card-actions>
     </div>
   </v-card>
@@ -36,8 +36,8 @@ export default {
   name: 'player-card',
   data() {
     return {
-      didVote: false
-    };
+      chancellorNomineeCrowdIndex: null
+    }
   },
   computed: {
     ...mapState({ user: 'user', crowd: 'crowd'}),
@@ -47,19 +47,62 @@ export default {
         } else {
             return 'You are not Hitler'
         }
-    }
+    },
+    chancellorNominee () {
+      var doesChancellorNomineeExist = false
+      var chancellorNominee = ''
+      this.crowd.forEach((element, index) => {
+        if (element.office === 'Chancellor Nominee') {
+          doesChancellorNomineeExist = true
+          chancellorNominee = element.username
+          this.chancellorNomineeCrowdIndex = index
+        }
+      })
+      if (doesChancellorNomineeExist === false) {
+        return ''
+      } else {
+        return chancellorNominee
+      }
+    },
+    isElectionComplete() {
+      var didEveryoneVote = true
+      for (let x = 0; x < this.crowd.length; x++) {
+        if (this.crowd[x].vote === null) {
+          didEveryoneVote = false
+        }
+      }
+      return didEveryoneVote
+    },
   },
   methods: {
     vote(ballot) {
-        for (let x = 0; x < this.crowd.length; x++) {
-            if (this.user.userId === this.crowd[x].userId) {
-              console.log(this.crowd[x])
-              this.crowd[x].vote = ballot
-              console.log(this.crowd[x])
-          }
-          firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+      console.log('vote', this.crowd)
+      for (let x = 0; x < this.crowd.length; x++) {
+        if (this.user.userId === this.crowd[x].userId) {
+          this.crowd[x].vote = ballot
           break
         }
+      }
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+      if (this.isElectionComplete) {
+        this.countVotes()
+      }
+    },
+    countVotes() {
+      var yesVotes = 0
+      var minimumVotesNeeded = Math.ceil((this.crowd.length/2))
+      for (let x = 0; x < this.crowd.length; x++) {
+        if (this.crowd[x].vote === true) {
+          yesVotes++
+          if (yesVotes >= minimumVotesNeeded) {
+            this.makeNomineeChancellor()
+          }
+        }
+      }
+    },
+    makeNomineeChancellor() {
+      this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     }
   }
 }

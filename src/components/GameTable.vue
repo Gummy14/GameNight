@@ -56,7 +56,7 @@
         </div>
 
         <v-btn class="start-button" @click="startGame">START GAME</v-btn>
-        <h3> The President has nominated {{ chancellorNominee }} for Chancellor</h3>
+        <h3 v-if="chancellorNominee != ''"> The President has nominated {{ chancellorNominee }} for Chancellor</h3>
         <v-card-title class="title">Player Board</v-card-title>
           <div v-if="user.office === 'President'" class="board player-hand">
             <v-card class="card-hand">
@@ -216,6 +216,9 @@ export default {
     },
     nominateChancellor (nominee) {
       this.clearChancellorNominee()
+      this.crowd.forEach(element => {
+        element.vote = null
+      })
       this.crowd[nominee].office = 'Chancellor Nominee'
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     },
