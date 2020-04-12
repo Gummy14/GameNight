@@ -69,6 +69,7 @@
                 </v-card>
               </draggable>
               <v-btn :disabled="hand.length != 2" dark class="handoff" @click="addPolicy()">
+                Hand off cards
               </v-btn>
             </v-card>
             <player-card class="player-card"> </player-card>
