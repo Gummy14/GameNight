@@ -76,7 +76,6 @@ export default {
   },
   methods: {
     vote(ballot) {
-<<<<<<< HEAD
       console.log('vote', this.crowd)
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.user.userId === this.crowd[x].userId) {
@@ -103,14 +102,6 @@ export default {
     },
     makeNomineeChancellor() {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
-=======
-        for (let i = 0; i < this.crowd.length; i++) {
-            if (this.user.userId === this.crowd[i].userId) {
-              this.crowd[i].vote = ballot
-              break
-          }
-        }
->>>>>>> e9476d05d550c5d254a34bdf348323cac8011519
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     }
   }
