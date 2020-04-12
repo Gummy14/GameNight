@@ -122,7 +122,7 @@ export default {
 .player-hand {
   padding: 10px;
   display: flex;
-  
+  max-width: 250px;
 }
 .button {
     flex: wrap;

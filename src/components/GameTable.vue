@@ -68,6 +68,8 @@
                 >
                 </v-card>
               </draggable>
+              <v-btn :disabled="hand.length != 2" dark class="handoff" @click="addPolicy()">
+              </v-btn>
             </v-card>
             <player-card class="player-card"> </player-card>
           </div>
@@ -127,7 +129,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user'}),
+    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user', policies: 'policies'}),
     chancellorNominee () {
       var doesChancellorNomineeExist = false
       var chancellorNominee = ''
@@ -163,6 +165,10 @@ export default {
         Deck: doc.data().deck
       })
 
+      self.$store.commit('setPolicies', {
+        Policies: doc.data().policies
+      })
+
     })
   },
   methods: {
@@ -192,6 +198,10 @@ export default {
     restoreDeck () {
       var deck = this.randomizeDeck()
       firebase.firestore().collection('root').doc('game-room').update({ deck: deck })
+    },
+    addPolicy () {
+        firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
+      this.hand = []
     },
     startGame () {
       this.assignRoles()
@@ -407,6 +417,10 @@ export default {
   background: burlywood;
   padding: 10px;
   width: 270px;
+}
+.handoff {
+  width: 100%;
+  margin-top: 10px;
 }
 .deck {
   width: 75px;
