@@ -58,7 +58,7 @@
         <v-btn class="start-button" @click="startGame">START GAME</v-btn>
         <h3 v-if="chancellorNominee != ''"> The President has nominated {{ chancellorNominee }} for Chancellor</h3>
         <v-card-title class="title">Player Board</v-card-title>
-          <div v-if="user.office === 'President'" class="board player-hand">
+          <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
             <v-card class="card-hand">
               <draggable class="hand" :list="hand" group="cards">
                 <v-card
@@ -68,7 +68,7 @@
                 >
                 </v-card>
               </draggable>
-              <v-btn :disabled="hand.length != 2" dark class="handoff" @click="addPolicy()">
+              <v-btn :disabled="hand.length != 2" class="handoff" @click="addPolicy()">
                 Hand off cards
               </v-btn>
             </v-card>
@@ -202,6 +202,9 @@ export default {
     },
     addPolicy () {
         firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
+      if (this.user.office === 'Chancellor') {
+        this.hand = policies
+      }
       this.hand = []
     },
     startGame () {
