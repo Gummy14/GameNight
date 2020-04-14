@@ -47,7 +47,10 @@ router.beforeEach((to, from, next) => {
     var user = {
       username: currentUser.displayName,
       userId: currentUser.uid,
-      email: currentUser.email
+      email: currentUser.email,
+      isHitler: false,
+      party: 'None',
+      office: 'None'
     }
 
     store.commit('setUser', {

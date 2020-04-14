@@ -6,8 +6,6 @@
                 <v-list-item-title class="headline mb-1"> {{ user.username}} </v-list-item-title>
                 <v-list-item-title class="headline mb-1">{{ user.party }}</v-list-item-title>
           <v-list-item-subtitle>{{isHitler}}</v-list-item-subtitle>
-                <!-- <v-card v-if="user.party==='Fascist'" class="fascist"></v-card>
-                <v-card v-else class="policy liberal"></v-card> -->
             </v-list-item-content> 
             <v-list-item-avatar
                 tile
@@ -76,7 +74,6 @@ export default {
   },
   methods: {
     vote(ballot) {
-      console.log('vote', this.crowd)
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.user.userId === this.crowd[x].userId) {
           this.crowd[x].vote = ballot
@@ -102,13 +99,7 @@ export default {
     },
     makeNomineeChancellor() {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
-      if (this.crowd[this.chancellorNomineeCrowdIndex].userId === this.user.userId) {
-        this.user.office = 'Chancellor'
-        this.$store.commit('setUser', {
-              User: this.user
-            })
-      }
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex] })
     }
   }
 }

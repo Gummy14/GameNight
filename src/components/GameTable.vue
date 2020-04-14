@@ -16,9 +16,6 @@
               {{ player.username }}
               <v-spacer></v-spacer>
             </v-list-item>
-            <!-- <div v-if="player.office != 'President'">
-              <v-btn v-if="user.office === 'President'" @click="nominateChancellor(index)"></v-btn>
-            </div> -->
           <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
           </div>
       </v-list>
@@ -134,11 +131,31 @@ export default {
         { name: "POLICY", type: 0, id: 16 },
       ],
       hand: [],
-      discard: []
+      discard: [],
+      setUpDoc: {
+        crowd: [],
+        fascistBoard: [],
+        liberalBoard: [],
+        deck: [],
+        president: null,
+        chancellor: null,
+        chancellorNominee: null,
+        policies: []
+      }
     };
   },
   computed: {
-    ...mapState({ crowd: 'crowd', fascistBoard: 'fascistBoard', liberalBoard: 'liberalBoard', deck: 'deck', user: 'user', policies: 'policies'}),
+    ...mapState({ 
+      crowd: 'crowd', 
+      fascistBoard: 'fascistBoard', 
+      liberalBoard: 'liberalBoard', 
+      deck: 'deck', 
+      user: 'user', 
+      policies: 'policies',
+      president: 'president',
+      chancellor: 'chancellor',
+      chancellorNominee: 'chancellorNominee'
+    }),
     chancellorNominee () {
       var doesChancellorNomineeExist = false
       var chancellorNominee = ''
@@ -160,6 +177,25 @@ export default {
     firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
       if (doc.data().policies.length === 2) {
         self.handOff()
+      }
+
+      if (doc.data().president?.userId === self.user.userId) {
+        self.$store.commit('setUser', {
+          User: doc.data().president
+        })
+      } else if (doc.data().chancellor?.userId === self.user.userId) {
+        self.$store.commit('setUser', {
+          User: doc.data().chancellor
+        })
+      } else if (doc.data().chancellorNominee?.userId === self.user.userId) {
+        self.$store.commit('setUser', {
+          User: doc.data().chancellorNominee
+        })
+      } else {
+        self.user.office = 'None'
+        self.$store.commit('setUser', {
+          User: self.user
+        })
       }
 
       self.$store.commit('setCrowd', {
@@ -198,6 +234,17 @@ export default {
         'chancellor-nominee': office === 'Chancellor Nominee'
       }
     },
+    startGame () {
+      var pick = Math.floor(Math.random() * (this.crowd.length))
+      this.hand = []
+      this.clearOffices()
+      this.assignRoles()
+      this.pickPresident(pick)
+      this.setUpDoc.deck = this.randomizeDeck()
+      this.setUpDoc.policies = []
+      this.setUpDoc.crowd = this.crowd
+      this.setUpGame()
+    },
     addFascistPolicy () {
       firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
     },
@@ -218,25 +265,19 @@ export default {
     clearPolicies () {
       firebase.firestore().collection('root').doc('game-room').update({ policies: [] })
     },
-    handOff() {
-      console.log('handOff')
-      if (this.user.office === 'Chancellor') {
-        this.hand = this.policies
-        this.$store.commit('setPolicies', {
-          Policies: []
-        })
-        this.clearPolicies()
-      }
+    setUpGame () {
+      firebase.firestore().collection('root').doc('game-room').set(this.setUpDoc)
     },
-    startGame () {
-      this.assignRoles()
-      this.restoreDeck()
-      this.clearPolicies()
+    clearOffices () {
       for (var x = 0; x < this.crowd.length; x++) {
         this.crowd[x].office = 'None'
       }
-      var pick = Math.floor(Math.random() * (this.crowd.length + 1))
-      this.pickPresident(pick)
+    },
+    handOff() {
+      if (this.user.office === 'Chancellor') {
+        this.hand = this.policies
+        this.clearPolicies()
+      }
     },
     randomizeDeck () {
       for (var i = this.defaultDeck.length - 1; i > 0; i--) {
@@ -247,16 +288,13 @@ export default {
       }
       return this.defaultDeck
     },
-    newTurn () {
-      this.changePresident()
-    },
     nominateChancellor (nominee) {
       this.clearChancellorNominee()
       this.crowd.forEach(element => {
         element.vote = null
       })
       this.crowd[nominee].office = 'Chancellor Nominee'
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: this.crowd[nominee] })
     },
     clearChancellorNominee () {
       for (let x=0; x < this.crowd.length; x++) {
@@ -265,28 +303,6 @@ export default {
         }
       }
     },
-    changePresident (oldPres) {
-      var lastPlayer = this.crowd.length
-      if (oldPres > 0) {
-        this.crowd[oldPres].office = 'None'
-      } else if (oldPres == lastPlayer) {
-        this.crowd[0].office = 'President'
-      }
-      var newPres = this.crowd[oldPres] + 1
-      this.crowd[newPres].office = 'President'
-      if (this.crowd[oldPres].userId === this.user.userId) {
-        this.user.office = 'President'
-        this.$store.commit('setUser', {
-              User: this.user
-            })
-      } else if (this.crowd[oldPres].userId !== this.user.userId) {
-        this.user.office = 'None'
-        this.$store.commit('setUser', {
-              User: this.user
-            })
-      }
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
-    },
     pickPresident (player) {
       if (player > 0) {
         this.crowd[player-1].office = 'None'
@@ -294,19 +310,9 @@ export default {
         var lastPlayer = this.crowd.length - 1
         this.crowd[lastPlayer].office = 'None'
       }
+
       this.crowd[player].office = 'President'
-      if (this.crowd[player].userId === this.user.userId) {
-        this.user.office = 'President'
-        this.$store.commit('setUser', {
-              User: this.user
-            })
-      } else if (this.crowd[player].userId !== this.user.userId) {
-        this.user.office = 'None'
-        this.$store.commit('setUser', {
-              User: this.user
-            })
-      }
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+      this.setUpDoc.president = this.crowd[player]
     },
     assignRoles () {
       var roleSet = []
@@ -348,13 +354,12 @@ export default {
       this.crowd.forEach((element, i) => {
         this.crowd[i].isHitler = roleSet[i].isHitler
         this.crowd[i].party = roleSet[i].party
-        if (this.crowd[i].userId === this.user.userId) {
-          this.$store.commit('setUser', {
-            User: this.crowd[i]
-          })
-        }
+        // if (this.crowd[i].userId === this.user.userId) {
+        //   this.$store.commit('setUser', {
+        //     User: this.crowd[i]
+        //   })
+        // }
       })
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     },
     createRoleSet(roleSet, numberOfLiberals, numberOfFascists) {
       var hitlerRole = {
@@ -381,6 +386,31 @@ export default {
       }
       return roleSet
     }
+    // newTurn () {
+    //   this.changePresident()
+    // },
+    // changePresident (oldPres) {
+    //   var lastPlayer = this.crowd.length
+    //   if (oldPres > 0) {
+    //     this.crowd[oldPres].office = 'None'
+    //   } else if (oldPres == lastPlayer) {
+    //     this.crowd[0].office = 'President'
+    //   }
+    //   var newPres = this.crowd[oldPres] + 1
+    //   this.crowd[newPres].office = 'President'
+    //   if (this.crowd[oldPres].userId === this.user.userId) {
+    //     this.user.office = 'President'
+    //     this.$store.commit('setUser', {
+    //           User: this.user
+    //         })
+    //   } else if (this.crowd[oldPres].userId !== this.user.userId) {
+    //     this.user.office = 'None'
+    //     this.$store.commit('setUser', {
+    //           User: this.user
+    //         })
+    //   }
+    //   firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+    // },
   }
 }
 </script>
