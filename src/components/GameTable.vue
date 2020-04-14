@@ -222,7 +222,7 @@ export default {
       console.log('handOff')
       if (this.user.office === 'Chancellor') {
         this.hand = this.policies
-        self.$store.commit('setPolicies', {
+        this.$store.commit('setPolicies', {
           Policies: []
         })
         this.clearPolicies()
