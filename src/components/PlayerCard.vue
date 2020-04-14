@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card dark>
     <div>
         <v-list-item>
             <v-list-item-content>
@@ -43,9 +43,9 @@ export default {
     ...mapState({ user: 'user', crowd: 'crowd'}),
     isHitler() {
         if (this.user.isHitler === true) {
-            return 'You are Hitler'
+            return 'You ARE Hitler'
         } else {
-            return 'You are not Hitler'
+            return 'You ARE NOT Hitler'
         }
     },
     chancellorNominee () {

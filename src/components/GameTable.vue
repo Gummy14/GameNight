@@ -1,26 +1,33 @@
 <template>
   <div>
-    <v-card class="login">
+    <v-card dark class="login">
       <v-list>
         <v-subheader class="space">PLAYERS</v-subheader>
-          <v-list-item
-            v-for="(player, index) in crowd"
-            :key="index"
-            :class="applyOffice(player.office)" 
-          > 
-            {{ player.username }}
-            <v-spacer></v-spacer>
-            <div v-if="player.office != 'President'">
+        <v-divider></v-divider>
+        <div
+          v-for="(player, index) in crowd"
+          :key="index"
+          :class="applyOffice(player.office)" >
+            <v-list-item v-if="user.office === 'President' && player.office != 'President'" @click="nominateChancellor(index)"> 
+              {{ player.username }}
+              <v-spacer></v-spacer>
+            </v-list-item>
+            <v-list-item v-else> 
+              {{ player.username }}
+              <v-spacer></v-spacer>
+            </v-list-item>
+            <!-- <div v-if="player.office != 'President'">
               <v-btn v-if="user.office === 'President'" @click="nominateChancellor(index)"></v-btn>
-            </div>
-          </v-list-item>
+            </div> -->
+          <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
+          </div>
       </v-list>
     </v-card>
 
     <div class="table">
       <div class="small-board">
         <v-card-title class="title">Discard</v-card-title>
-        <v-card>
+        <v-card dark>
           <draggable class="discard-stack" :list="discard" group="cards">
           </draggable>
         </v-card>
@@ -29,7 +36,7 @@
       <div>
         <div class="board">
           <v-card-title class="title">Fascist Board</v-card-title>
-          <v-card class="board">
+          <v-card dark class="board">
             <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy">
               <v-card
                 :class="applyClass(element.type)"
@@ -43,7 +50,7 @@
 
         <div class="board">
           <v-card-title class="title">Liberal Board</v-card-title>
-          <v-card class="board">
+          <v-card dark class="board">
             <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy">
               <v-card
                 :class="applyClass(element.type)"
@@ -55,7 +62,7 @@
           </v-card>
         </div>
 
-        <v-btn class="start-button" @click="startGame">START GAME</v-btn>
+        <v-btn dark class="start-button" @click="startGame">START GAME</v-btn>
         <h3 v-if="chancellorNominee != ''"> The President has nominated {{ chancellorNominee }} for Chancellor</h3>
         <v-card-title class="title">Player Board</v-card-title>
           <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
@@ -68,7 +75,7 @@
                 >
                 </v-card>
               </draggable>
-              <v-btn :disabled="hand.length != 2" class="handoff" @click="addPolicy()">
+              <v-btn :outlined="hand.length != 2" color="#1e1e1e" :disabled="hand.length != 2" class="handoff" @click="addPolicy()">
                 Hand off cards
               </v-btn>
             </v-card>
@@ -81,13 +88,14 @@
         <v-card-title class="title">Policy Deck</v-card-title>
         <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck">
           <v-card
+            dark
             class="deck"
             v-for="(element) in deck"
             :key="element.id"
           >
           </v-card>
         </draggable>
-        <v-btn @click="restoreDeck">Restore</v-btn>
+        <v-btn dark @click="restoreDeck">Restore</v-btn>
       </div>
     </div>
   </div>
@@ -202,9 +210,9 @@ export default {
     },
     addPolicy () {
         firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
-      if (this.user.office === 'Chancellor') {
-        this.hand = policies
-      }
+      // if (this.user.office === 'Chancellor') {
+      //   this.hand = policies
+      // }
       this.hand = []
     },
     startGame () {
@@ -425,6 +433,7 @@ export default {
 .handoff {
   width: 100%;
   margin-top: 10px;
+  color: white;
 }
 .deck {
   width: 75px;
