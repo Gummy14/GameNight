@@ -209,11 +209,17 @@ export default {
       firebase.firestore().collection('root').doc('game-room').update({ deck: deck })
     },
     addPolicy () {
-        firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
-      // if (this.user.office === 'Chancellor') {
-      //   this.hand = policies
-      // }
-      this.hand = []
+      firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
+      this.handoff()
+    },
+    handOff() {
+      for (var x = 0; x < this.crowd.length; x++) {
+        if (this.crowd[x].office != 'Chancellor') {
+          this.user.hand = []
+        } else {
+          this.user.hand = this.policies
+        }
+      }
     },
     startGame () {
       this.assignRoles()
