@@ -178,6 +178,8 @@ export default {
         Policies: doc.data().policies
       })
 
+      self.handOff()
+
     })
   },
   methods: {
@@ -210,15 +212,13 @@ export default {
     },
     addPolicy () {
       firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
-      this.handoff()
+      this.hand = []
     },
     handOff() {
-      for (var x = 0; x < this.crowd.length; x++) {
-        if (this.crowd[x].office != 'Chancellor') {
-          this.user.hand = []
-        } else {
-          this.user.hand = this.policies
-        }
+      if (this.user.office != 'Chancellor') {
+        this.hand = []
+      } else {
+        this.hand = this.policies
       }
     },
     startGame () {

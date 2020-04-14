@@ -102,6 +102,12 @@ export default {
     },
     makeNomineeChancellor() {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
+      if (this.crowd[this.chancellorNomineeCrowdIndex].userId === this.user.userId) {
+        this.user.office = 'Chancellor'
+        this.$store.commit('setUser', {
+              User: this.user
+            })
+      }
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     }
   }

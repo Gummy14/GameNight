@@ -30,7 +30,7 @@ export default new Vuex.Store({
       state.deck = payload.Deck
     },
     setPolicies (state, payload) {
-      state.Policies = payload.Policies
+      state.policies = payload.Policies
     },
     clearStore (state) {
       state.user = undefined,
