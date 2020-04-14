@@ -158,13 +158,13 @@ export default {
   mounted () {
     var self = this
     firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
+      if (doc.data().policies.length === 2) {
+        self.handOff()
+      }
+
       self.$store.commit('setCrowd', {
         Crowd: doc.data().crowd
       })
-
-      // if (doc.data().liberalBoard === self.liberalBoard && doc.data().fascistBoard === self.fascistBoard && doc.data().policies != self.policies) {
-      //   self.handOff()
-      // }
 
       self.$store.commit('setFascistBoard', {
         FascistBoard: doc.data().fascistBoard
@@ -181,7 +181,6 @@ export default {
       self.$store.commit('setPolicies', {
         Policies: doc.data().policies
       })
-
     })
   },
   methods: {
@@ -216,17 +215,23 @@ export default {
       firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
       this.hand = []
     },
+    clearPolicies () {
+      firebase.firestore().collection('root').doc('game-room').update({ policies: [] })
+    },
     handOff() {
-      if (this.user.office != 'Chancellor') {
-        this.hand = []
-      } else {
+      console.log('handOff')
+      if (this.user.office === 'Chancellor') {
         this.hand = this.policies
-        firebase.firestore().collection('root').doc('game-room').update({ policies: [] })
+        self.$store.commit('setPolicies', {
+          Policies: []
+        })
+        this.clearPolicies()
       }
     },
     startGame () {
       this.assignRoles()
       this.restoreDeck()
+      this.clearPolicies()
       for (var x = 0; x < this.crowd.length; x++) {
         this.crowd[x].office = 'None'
       }
