@@ -162,6 +162,10 @@ export default {
         Crowd: doc.data().crowd
       })
 
+      // if (doc.data().liberalBoard === self.liberalBoard && doc.data().fascistBoard === self.fascistBoard && doc.data().policies != self.policies) {
+      //   self.handOff()
+      // }
+
       self.$store.commit('setFascistBoard', {
         FascistBoard: doc.data().fascistBoard
       })
@@ -177,8 +181,6 @@ export default {
       self.$store.commit('setPolicies', {
         Policies: doc.data().policies
       })
-
-      self.handOff()
 
     })
   },
@@ -219,6 +221,7 @@ export default {
         this.hand = []
       } else {
         this.hand = this.policies
+        firebase.firestore().collection('root').doc('game-room').update({ policies: [] })
       }
     },
     startGame () {
