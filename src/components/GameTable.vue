@@ -354,11 +354,11 @@ export default {
       this.crowd.forEach((element, i) => {
         this.crowd[i].isHitler = roleSet[i].isHitler
         this.crowd[i].party = roleSet[i].party
-        // if (this.crowd[i].userId === this.user.userId) {
-        //   this.$store.commit('setUser', {
-        //     User: this.crowd[i]
-        //   })
-        // }
+        if (this.crowd[i].userId === this.user.userId) {
+          this.$store.commit('setUser', {
+            User: this.crowd[i]
+          })
+        }
       })
     },
     createRoleSet(roleSet, numberOfLiberals, numberOfFascists) {
