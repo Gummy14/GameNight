@@ -88,18 +88,43 @@ export default {
     countVotes() {
       var yesVotes = 0
       var minimumVotesNeeded = Math.ceil((this.crowd.length/2))
+      console.log("it is calling countVotes")
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.crowd[x].vote === true) {
           yesVotes++
-          if (yesVotes >= minimumVotesNeeded) {
-            this.makeNomineeChancellor()
-          }
         }
+      }
+      if (yesVotes > minimumVotesNeeded) {
+        this.makeNomineeChancellor()
+      } else {
+        this.failedGovernment()
       }
     },
     makeNomineeChancellor() {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex] })
+    },
+    changePresident (player) {
+      var lastPlayer = this.crowd.length - 1
+      var pres = null
+      if (player != lastPlayer) {
+          this.crowd[player].office = 'None'
+          this.crowd[player + 1].office = 'President'
+          pres = player + 1
+      } else {
+          this.crowd[player].office = 'None'
+          this.crowd[0].office = 'President'
+          pres = 0
+      }
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[pres] })
+    },
+    failedGovernment () {
+      for (let x = 0; x < this.crowd.length; x++) {
+          if (this.crowd[x].office === 'President') {
+              this.changePresident(x)
+              break
+          }
+      }
     }
   }
 }

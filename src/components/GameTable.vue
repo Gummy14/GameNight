@@ -385,32 +385,25 @@ export default {
         roleSet.splice(j+1+numberOfLiberals, 1, fascistRole)
       }
       return roleSet
+    },
+    changePresident (player) {
+      var lastPlayer = this.crowd.length - 1
+      var pres = null
+      if (player != lastPlayer) {
+          this.crowd[player].office = 'None'
+          this.crowd[player + 1].office = 'President'
+          pres = player + 1
+      } else {
+          this.crowd[player].office = 'None'
+          this.crowd[0].office = 'President'
+          pres = 0
+      }
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[pres] })
+    },
+    newTurn () {
+      this.changePresident()
+      this.clearChancellorNominee()
     }
-    // newTurn () {
-    //   this.changePresident()
-    // },
-    // changePresident (oldPres) {
-    //   var lastPlayer = this.crowd.length
-    //   if (oldPres > 0) {
-    //     this.crowd[oldPres].office = 'None'
-    //   } else if (oldPres == lastPlayer) {
-    //     this.crowd[0].office = 'President'
-    //   }
-    //   var newPres = this.crowd[oldPres] + 1
-    //   this.crowd[newPres].office = 'President'
-    //   if (this.crowd[oldPres].userId === this.user.userId) {
-    //     this.user.office = 'President'
-    //     this.$store.commit('setUser', {
-    //           User: this.user
-    //         })
-    //   } else if (this.crowd[oldPres].userId !== this.user.userId) {
-    //     this.user.office = 'None'
-    //     this.$store.commit('setUser', {
-    //           User: this.user
-    //         })
-    //   }
-    //   firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
-    // },
   }
 }
 </script>
