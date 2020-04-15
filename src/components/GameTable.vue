@@ -34,7 +34,7 @@
         <div class="board">
           <v-card-title class="title">Fascist Board</v-card-title>
           <v-card dark class="board">
-            <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy">
+            <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy" :disabled="user.office!='Chancellor'">
               <v-card
                 :class="applyClass(element.type)"
                 v-for="(element) in fascistBoard"
@@ -48,7 +48,7 @@
         <div class="board">
           <v-card-title class="title">Liberal Board</v-card-title>
           <v-card dark class="board">
-            <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy">
+            <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy" :disabled="user.office!='Chancellor'">
               <v-card
                 :class="applyClass(element.type)"
                 v-for="(element) in liberalBoard"
@@ -83,7 +83,7 @@
       
       <div class="small-board">
         <v-card-title class="title">Policy Deck</v-card-title>
-        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck">
+        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office!='President'">
           <v-card
             dark
             class="deck"

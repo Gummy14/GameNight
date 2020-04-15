@@ -116,7 +116,8 @@ export default {
           this.crowd[0].office = 'President'
           pres = 0
       }
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[pres] })
+      this.crowd[this.chancellorNomineeCrowdIndex].office = 'None'
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[pres], chancellorNominee: null })
     },
     failedGovernment () {
       for (let x = 0; x < this.crowd.length; x++) {
