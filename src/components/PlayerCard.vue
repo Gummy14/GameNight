@@ -5,7 +5,7 @@
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1"> {{ user.username}} </v-list-item-title>
                 <v-list-item-title class="headline mb-1">{{ user.party }}</v-list-item-title>
-          <v-list-item-subtitle>{{isHitler}}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{isHitler}}</v-list-item-subtitle>
             </v-list-item-content> 
             <v-list-item-avatar
                 tile

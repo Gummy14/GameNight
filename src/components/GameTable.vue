@@ -32,30 +32,34 @@
 
       <div>
         <div class="board">
-          <v-card-title class="title">Fascist Board</v-card-title>
           <v-card dark class="board">
-            <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy" :disabled="user.office!='Chancellor'">
-              <v-card
-                :class="applyClass(element.type)"
-                v-for="(element) in fascistBoard"
-                :key="element.id"
-              >
-              </v-card>
-            </draggable>
+            <v-img src="https://miro.medium.com/max/2000/1*rnfWK2ASMWQXbRjxwlbVqg.png" height="auto" width="100%">
+              <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy"> 
+              <!-- :disabled="user.office!='Chancellor'"> -->
+                <v-card
+                  :class="applyClass(element.type)"
+                  v-for="(element) in fascistBoard"
+                  :key="element.id"
+                >
+                </v-card>
+              </draggable>
+            </v-img>
           </v-card>
         </div>
 
         <div class="board">
-          <v-card-title class="title">Liberal Board</v-card-title>
-          <v-card dark class="board">
-            <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy" :disabled="user.office!='Chancellor'">
-              <v-card
-                :class="applyClass(element.type)"
-                v-for="(element) in liberalBoard"
-                :key="element.id"
-              >
-              </v-card>
-            </draggable>
+          <v-card dark class="board"> 
+            <v-img src="https://miro.medium.com/max/2000/1*MggrZZYsCG3TYk3ARZSzNg.png" height="auto" width="100%" class="img">
+              <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy">
+                <!-- :disabled="user.office!='Chancellor'"> -->
+                <v-card
+                  :class="applyClass(element.type)"
+                  v-for="(element) in liberalBoard"
+                  :key="element.id"
+                > 
+                </v-card>
+              </draggable>
+            </v-img>
           </v-card>
         </div>
 
@@ -422,7 +426,7 @@ export default {
   transform: translate(-50%, -50%);
 }
 .policy {
-  width: 75px;
+  width: 85px;
   height: 125px;
   margin-right: 10px;
 }
@@ -444,14 +448,16 @@ export default {
 }
 .fascist-board {
   height: 125px;
+  margin: 70px 70px auto 70px;
   display: flex;
 }
 .liberal-board {
-  height: 125px;
+  height: 150px;
+  margin: 70px 120px auto 120px;
   display: flex;
 }
 .board {
-  width: 550px;
+  width: 750px;
   padding: 10px;
 }
 .player-hand {
