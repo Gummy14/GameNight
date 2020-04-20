@@ -74,7 +74,8 @@
         </div>
 
         <v-btn dark class="start-button" @click="startGame">START GAME</v-btn>
-        <h3 v-if="chancellorNominee != ''"> The President has nominated {{ chancellorNominee }} for Chancellor</h3>
+        <v-btn dark class="start-button" @click="newTurn" v-if="policyEnacted">NEXT TURN</v-btn>
+        <h3 v-if="chancellorNominee != null"> The President has nominated {{ chancellorNominee.username }} for Chancellor</h3>
         <v-card-title class="title">Player Board</v-card-title>
           <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
             <v-card class="card-hand">
@@ -104,7 +105,7 @@
       
       <div class="small-board">
         <v-card-title class="title">Policy Deck</v-card-title>
-        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck"> <!-- :disabled="user.office!='President'"> -->
+        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office!='President' || hand.length === 3">
           <v-card
             dark
             class="deck"
@@ -163,7 +164,8 @@ export default {
         chancellor: null,
         chancellorNominee: null,
         policies: []
-      }
+      },
+      policyEnacted: false
     };
   },
   computed: {
@@ -177,29 +179,12 @@ export default {
       president: 'president',
       chancellor: 'chancellor',
       chancellorNominee: 'chancellorNominee'
-    }),
-    chancellorNominee () {
-      var doesChancellorNomineeExist = false
-      var chancellorNominee = ''
-      this.crowd.forEach(element => {
-        if (element.office === 'Chancellor Nominee') {
-          doesChancellorNomineeExist = true
-          chancellorNominee = element.username
-        }
-      })
-      if (doesChancellorNomineeExist === false) {
-        return ''
-      } else {
-        return chancellorNominee
-      }
-    }
+    })
   },
   mounted () {
     var self = this
     firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
-      console.log('mounted')
       if (doc.data().policies.length === 2) {
-        console.log('HERE')
         self.handOff()
       }
 
@@ -220,6 +205,7 @@ export default {
         self.$store.commit('setUser', {
           User: self.user
         })
+
       }
 
       self.$store.commit('setCrowd', {
@@ -282,9 +268,11 @@ export default {
       this.setUpGame()
     },
     addFascistPolicy () {
+      this.policyEnacted = true
       firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
     },
     addLiberalPolicy () {
+      this.policyEnacted = true
       firebase.firestore().collection('root').doc('game-room').update({ liberalBoard: this.liberalBoard })
     },
     removePolicyFromDeck () {
@@ -311,8 +299,6 @@ export default {
     },
     handOff() {
       if (this.user.office === 'Chancellor') {
-        console.log('TEST')
-        console.log('IF', this.policies)
         this.hand = this.policies
       }
       this.hasDiscarded = false
@@ -424,10 +410,23 @@ export default {
       }
       return roleSet
     },
+    newTurn () {
+      this.policyEnacted = false
+      var currentPresident
+      for (let r = 0; r < this.crowd.length; r++) {
+        if (this.president.userId === this.crowd[r].userId) {
+          currentPresident = r
+          break;
+        }
+      }
+      var newPresident = this.changePresident(currentPresident)
+      this.clearChancellorNominee()
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null })
+    },
     changePresident (player) {
-      var lastPlayer = this.crowd.length - 1
+      var lastPlayerInCrowd = this.crowd.length - 1
       var pres = null
-      if (player != lastPlayer) {
+      if (player != lastPlayerInCrowd) {
           this.crowd[player].office = 'None'
           this.crowd[player + 1].office = 'President'
           pres = player + 1
@@ -436,12 +435,8 @@ export default {
           this.crowd[0].office = 'President'
           pres = 0
       }
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[pres] })
+      return pres
     },
-    newTurn () {
-      this.changePresident()
-      this.clearChancellorNominee()
-    }
   },
   watch: {
     discard() {

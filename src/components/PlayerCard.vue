@@ -121,10 +121,10 @@ export default {
     },
     failedGovernment () {
       for (let x = 0; x < this.crowd.length; x++) {
-          if (this.crowd[x].office === 'President') {
-              this.changePresident(x)
-              break
-          }
+        if (this.crowd[x].office === 'President') {
+          this.changePresident(x)
+          break
+        }
       }
     }
   }
