@@ -226,6 +226,18 @@ export default {
         Crowd: doc.data().crowd
       })
 
+      self.$store.commit('setPresident', {
+        President: doc.data().president
+      })
+
+      self.$store.commit('setChancellor', {
+        Chancellor: doc.data().chancellor
+      })
+
+      self.$store.commit('setChancellorNominee', {
+        ChancellorNominee: doc.data().chancellorNominee
+      })
+
       self.$store.commit('setFascistBoard', {
         FascistBoard: doc.data().fascistBoard
       })
@@ -302,7 +314,6 @@ export default {
         console.log('TEST')
         console.log('IF', this.policies)
         this.hand = this.policies
-        this.clearPolicies()
       }
       this.hasDiscarded = false
     },
@@ -435,6 +446,9 @@ export default {
   watch: {
     discard() {
       this.hasDiscarded = true
+      if (this.user.office === 'Chancellor') {
+        this.clearPolicies()
+      }
     }
   }
 }
