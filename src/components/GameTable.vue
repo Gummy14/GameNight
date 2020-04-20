@@ -33,7 +33,7 @@
       <div>
         <div class="board">
           <v-card dark class="board">
-            <v-img src="https://miro.medium.com/max/2000/1*rnfWK2ASMWQXbRjxwlbVqg.png" height="auto" width="100%">
+            <v-img src="../assets/fascist-board.png" height="auto" width="100%">
               <draggable 
                 class="fascist-board" 
                 :list="fascistBoard" 
@@ -54,7 +54,7 @@
 
         <div class="board">
           <v-card dark class="board"> 
-            <v-img src="https://miro.medium.com/max/2000/1*MggrZZYsCG3TYk3ARZSzNg.png" height="auto" width="100%" class="img">
+            <v-img src="../assets/liberal-board.png" height="auto" width="100%" class="img">
               <draggable 
                 class="liberal-board" 
                 :list="liberalBoard" 
