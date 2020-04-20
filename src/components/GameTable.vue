@@ -34,8 +34,7 @@
         <div class="board">
           <v-card dark class="board">
             <v-img src="https://miro.medium.com/max/2000/1*rnfWK2ASMWQXbRjxwlbVqg.png" height="auto" width="100%">
-              <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy"> 
-              <!-- :disabled="user.office!='Chancellor'"> -->
+              <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy" :disabled="user.office!='Chancellor'">
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in fascistBoard"
@@ -50,8 +49,7 @@
         <div class="board">
           <v-card dark class="board"> 
             <v-img src="https://miro.medium.com/max/2000/1*MggrZZYsCG3TYk3ARZSzNg.png" height="auto" width="100%" class="img">
-              <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy">
-                <!-- :disabled="user.office!='Chancellor'"> -->
+              <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy" :disabled="user.office!='Chancellor'">
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in liberalBoard"
@@ -179,7 +177,9 @@ export default {
   mounted () {
     var self = this
     firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
+      console.log('mounted')
       if (doc.data().policies.length === 2) {
+        console.log('HERE')
         self.handOff()
       }
 
@@ -279,6 +279,8 @@ export default {
     },
     handOff() {
       if (this.user.office === 'Chancellor') {
+        console.log('IF')
+        console.log('TEST')
         this.hand = this.policies
         this.clearPolicies()
       }
