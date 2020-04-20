@@ -431,10 +431,12 @@ export default {
   margin-right: 10px;
 }
 .fascist{
-  background: red;
+  background-image: url("../assets/fascist-card.png");
+  background-size: 100%;
 }
 .liberal{
-  background: blue;
+  background-image: url("../assets/liberal-card.png");
+  background-size: 100%;
 }
 .president {
   color: yellow;
