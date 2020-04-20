@@ -34,7 +34,13 @@
         <div class="board">
           <v-card dark class="board">
             <v-img src="https://miro.medium.com/max/2000/1*rnfWK2ASMWQXbRjxwlbVqg.png" height="auto" width="100%">
-              <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy" :disabled="user.office != 'Chancellor' || hand.length != 1">
+              <draggable 
+                class="fascist-board" 
+                :list="fascistBoard" 
+                group="cards" 
+                @change="addFascistPolicy" 
+                :disabled="user.office != 'Chancellor' || hand.length != 1"
+              >
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in fascistBoard"
@@ -49,7 +55,13 @@
         <div class="board">
           <v-card dark class="board"> 
             <v-img src="https://miro.medium.com/max/2000/1*MggrZZYsCG3TYk3ARZSzNg.png" height="auto" width="100%" class="img">
-              <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy" :disabled="user.office != 'Chancellor' || hand.length != 1">
+              <draggable 
+                class="liberal-board" 
+                :list="liberalBoard" 
+                group="cards" 
+                @change="addLiberalPolicy" 
+                :disabled="user.office != 'Chancellor' || hand.length != 1"
+              >
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in liberalBoard"
@@ -74,7 +86,14 @@
                 >
                 </v-card>
               </draggable>
-              <v-btn :outlined="hand.length != 2 || !hasDiscarded" color="#1e1e1e" :disabled="hand.length != 2 || !hasDiscarded" class="handoff" @click="addPolicy()">
+              <v-btn 
+                v-if="user.office === 'President'" 
+                :outlined="hand.length != 2 || !hasDiscarded" 
+                color="#1e1e1e" 
+                :disabled="hand.length != 2 || !hasDiscarded" 
+                class="handoff" 
+                @click="addPolicy()"
+              >
                 Hand off cards
               </v-btn>
             </v-card>
