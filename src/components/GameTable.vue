@@ -475,7 +475,7 @@ export default {
 .card-hand {
   background: burlywood;
   padding: 10px;
-  width: 270px;
+  width: 375px;
 }
 .handoff {
   width: 100%;
@@ -521,6 +521,6 @@ export default {
 }
 .player-card {
   margin-left: 10px;
-  width: 270px;
+  max-width: 375px;
 }
 </style>

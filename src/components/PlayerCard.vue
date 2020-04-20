@@ -3,18 +3,18 @@
     <div>
         <v-list-item>
             <v-list-item-content>
-                <v-list-item-title class="headline mb-1"> {{ user.username}} </v-list-item-title>
+                <v-list-item-title class="headline mb-1 text-wrap"> {{ user.username}} </v-list-item-title>
                 <v-list-item-title class="headline mb-1">{{ user.party }}</v-list-item-title>
                 <v-list-item-subtitle>{{isHitler}}</v-list-item-subtitle>
             </v-list-item-content> 
             <v-list-item-avatar
                 tile
-                size="80"
+                size="100"
                 v-if="user.party==='Fascist'" class="fascist"
                 ></v-list-item-avatar>
             <v-list-item-avatar
                 tile
-                size="80"
+                size="100"
                 v-else class="liberal"
                 ></v-list-item-avatar>
                 
@@ -131,16 +131,21 @@ export default {
 }
 </script>
 <style scoped>
+.text-wrap {
+    flex: wrap;
+}
 .policy {
   max-width: 75px;
   height: 125px;
   margin-right: 10px;
 }
 .fascist{
-  background: red;
+  background-image: url("../assets/fascist-party-card.png");
+  background-size: 100%;
 }
 .liberal{
-  background: blue;
+  background-image: url("../assets/liberal-party-card.png");
+  background-size: 100%;
 }
 .player-hand {
   padding: 10px;
