@@ -34,7 +34,7 @@
         <div class="board">
           <v-card dark class="board">
             <v-img src="https://miro.medium.com/max/2000/1*rnfWK2ASMWQXbRjxwlbVqg.png" height="auto" width="100%">
-              <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy" :disabled="user.office!='Chancellor' && user.hand!=1">
+              <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy" :disabled="user.office != 'Chancellor' || hand.length != 1">
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in fascistBoard"
@@ -49,7 +49,7 @@
         <div class="board">
           <v-card dark class="board"> 
             <v-img src="https://miro.medium.com/max/2000/1*MggrZZYsCG3TYk3ARZSzNg.png" height="auto" width="100%" class="img">
-              <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy" :disabled="user.office!='Chancellor' && user.hand!=1">
+              <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy" :disabled="user.office != 'Chancellor' || hand.length != 1">
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in liberalBoard"
@@ -280,8 +280,8 @@ export default {
     },
     handOff() {
       if (this.user.office === 'Chancellor') {
-        console.log('IF')
         console.log('TEST')
+        console.log('IF', this.policies)
         this.hand = this.policies
         this.clearPolicies()
       }
