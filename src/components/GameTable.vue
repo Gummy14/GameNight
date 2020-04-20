@@ -34,7 +34,7 @@
         <div class="board">
           <v-card dark class="board">
             <v-img src="https://miro.medium.com/max/2000/1*rnfWK2ASMWQXbRjxwlbVqg.png" height="auto" width="100%">
-              <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy" :disabled="user.office!='Chancellor'">
+              <draggable class="fascist-board" :list="fascistBoard" group="cards" @change="addFascistPolicy" :disabled="user.office!='Chancellor' && user.hand!=1">
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in fascistBoard"
@@ -49,7 +49,7 @@
         <div class="board">
           <v-card dark class="board"> 
             <v-img src="https://miro.medium.com/max/2000/1*MggrZZYsCG3TYk3ARZSzNg.png" height="auto" width="100%" class="img">
-              <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy" :disabled="user.office!='Chancellor'">
+              <draggable class="liberal-board" :list="liberalBoard" group="cards" @change="addLiberalPolicy" :disabled="user.office!='Chancellor' && user.hand!=1">
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in liberalBoard"
@@ -74,7 +74,7 @@
                 >
                 </v-card>
               </draggable>
-              <v-btn :outlined="hand.length != 2" color="#1e1e1e" :disabled="hand.length != 2" class="handoff" @click="addPolicy()">
+              <v-btn :outlined="hand.length != 2 || !hasDiscarded" color="#1e1e1e" :disabled="hand.length != 2 || !hasDiscarded" class="handoff" @click="addPolicy()">
                 Hand off cards
               </v-btn>
             </v-card>
@@ -85,7 +85,7 @@
       
       <div class="small-board">
         <v-card-title class="title">Policy Deck</v-card-title>
-        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office!='President'">
+        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck"> <!-- :disabled="user.office!='President'"> -->
           <v-card
             dark
             class="deck"
@@ -134,6 +134,7 @@ export default {
       ],
       hand: [],
       discard: [],
+      hasDiscarded: false,
       setUpDoc: {
         crowd: [],
         fascistBoard: [],
@@ -284,6 +285,7 @@ export default {
         this.hand = this.policies
         this.clearPolicies()
       }
+      this.hasDiscarded = false
     },
     randomizeDeck () {
       for (var i = this.defaultDeck.length - 1; i > 0; i--) {
@@ -409,6 +411,11 @@ export default {
     newTurn () {
       this.changePresident()
       this.clearChancellorNominee()
+    }
+  },
+  watch: {
+    discard() {
+      this.hasDiscarded = true
     }
   }
 }
