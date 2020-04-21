@@ -74,7 +74,6 @@
         </div>
 
         <v-btn dark class="start-button" @click="startGame">START GAME</v-btn>
-        <v-btn dark class="start-button" @click="newTurn" v-if="policyEnacted">NEXT TURN</v-btn>
         <h3 v-if="chancellorNominee != null"> The President has nominated {{ chancellorNominee.username }} for Chancellor</h3>
         <v-card-title class="title">Player Board</v-card-title>
           <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
@@ -164,8 +163,7 @@ export default {
         chancellor: null,
         chancellorNominee: null,
         policies: []
-      },
-      policyEnacted: false
+      }
     };
   },
   computed: {
@@ -268,12 +266,10 @@ export default {
       this.setUpGame()
     },
     addFascistPolicy () {
-      this.policyEnacted = true
-      firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+      this.newTurn(0)
     },
     addLiberalPolicy () {
-      this.policyEnacted = true
-      firebase.firestore().collection('root').doc('game-room').update({ liberalBoard: this.liberalBoard })
+      this.newTurn(1)
     },
     removePolicyFromDeck () {
       firebase.firestore().collection('root').doc('game-room').update({ deck: this.deck })
@@ -410,7 +406,7 @@ export default {
       }
       return roleSet
     },
-    newTurn () {
+    newTurn (policyAdded) {
       this.policyEnacted = false
       var currentPresident
       for (let r = 0; r < this.crowd.length; r++) {
@@ -421,7 +417,11 @@ export default {
       }
       var newPresident = this.changePresident(currentPresident)
       this.clearChancellorNominee()
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null })
+      if (policyAdded === 0) {
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, fascistBoard: this.fascistBoard })
+      } else if (policyAdded === 1) {
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, liberalBoard: this.liberalBoard })
+      }
     },
     changePresident (player) {
       var lastPlayerInCrowd = this.crowd.length - 1
