@@ -38,7 +38,13 @@ export default {
     }
   },
   computed: {
-    ...mapState({ user: 'user', crowd: 'crowd', failedGovernmentCount: 'failedGovernmentCount'}),
+    ...mapState({ 
+      user: 'user', 
+      crowd: 'crowd', 
+      failedGovernmentCount: 'failedGovernmentCount', 
+      fascistBoard: 'fascistBoard', 
+      liberalBoard: 'liberalBoard', 
+      deck: 'deck', }),
     isHitler() {
         if (this.user.isHitler === true) {
             return 'You ARE Hitler'
@@ -102,11 +108,12 @@ export default {
     },
     makeNomineeChancellor() {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex] })
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0 })
     },
     changePresident (player) {
       var lastPlayer = this.crowd.length - 1
       var pres = null
+      this.crowd[this.chancellorNomineeCrowdIndex].office = 'None'
       if (player != lastPlayer) {
           this.crowd[player].office = 'None'
           this.crowd[player + 1].office = 'President'
@@ -116,20 +123,36 @@ export default {
           this.crowd[0].office = 'President'
           pres = 0
       }
-      this.crowd[this.chancellorNomineeCrowdIndex].office = 'None'
       firebase.firestore().collection('root').doc('game-room').update({ 
         crowd: this.crowd, 
+        deck: this.deck,
+        liberalBoard: this.liberalBoard,
+        fascistBoard: this.fascistBoard,
         president: this.crowd[pres], 
-        chancellorNominee: null, 
-        failedGovernmentCount: this.failedGovernmentCount + 1 
+        chancellorNominee: null,
+        chancellor: null,
+        failedGovernmentCount: this.failedGovernmentCount + 1 === 3 ? 0 : this.failedGovernmentCount + 1
       })
     },
     failedGovernment () {
+      if (this.failedGovernmentCount + 1 === 3) {
+        this.enactTopPolicy()
+      } 
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.crowd[x].office === 'President') {
           this.changePresident(x)
           break
         }
+      }
+    },
+    enactTopPolicy () {
+      var topPolicy = this.deck[0]
+      if (topPolicy.type === 0) {
+        this.deck.splice(0, 1)
+        this.fascistBoard.push(topPolicy)
+      } else if (topPolicy.type === 1) {
+        this.deck.splice(0, 1)
+        this.liberalBoard.push(topPolicy)
       }
     }
   }

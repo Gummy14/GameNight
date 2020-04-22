@@ -59,7 +59,7 @@
                 class="liberal-board" 
                 :list="liberalBoard" 
                 group="cards" 
-                @change="addLiberalPolicy" 
+                @change="addLiberalPolicy"
                 :disabled="user.office != 'Chancellor' || hand.length != 1"
               >
                 <v-card
@@ -580,8 +580,8 @@ export default {
 }
 .failed-government-tracker {
   position: relative;
-  top:-9.4%;
-  padding-left: 35.5%;
+  top:-9.5%;
+  padding-left: 35.45%;
   padding-right: 36.25%;
   margin-bottom: -5%;
 }
