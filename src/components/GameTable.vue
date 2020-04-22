@@ -154,6 +154,7 @@ export default {
       hand: [],
       discard: [],
       hasDiscarded: false,
+      
       setUpDoc: {
         crowd: [],
         fascistBoard: [],
@@ -162,7 +163,8 @@ export default {
         president: null,
         chancellor: null,
         chancellorNominee: null,
-        policies: []
+        policies: [],
+        graveyard: []
       }
     };
   },
@@ -176,7 +178,8 @@ export default {
       policies: 'policies',
       president: 'president',
       chancellor: 'chancellor',
-      chancellorNominee: 'chancellorNominee'
+      chancellorNominee: 'chancellorNominee',
+      graveyard: 'graveyard'
     })
   },
   mounted () {
@@ -203,7 +206,6 @@ export default {
         self.$store.commit('setUser', {
           User: self.user
         })
-
       }
 
       self.$store.commit('setCrowd', {
@@ -237,6 +239,10 @@ export default {
       self.$store.commit('setPolicies', {
         Policies: doc.data().policies
       })
+
+      self.$store.commit('setGraveyard', {
+        Graveyard: doc.data().graveyard
+      })
     })
   },
   methods: {
@@ -251,7 +257,8 @@ export default {
       return {
         'president': office === 'President',
         'chancellor': office === 'Chancellor',
-        'chancellor-nominee': office === 'Chancellor Nominee'
+        'chancellor-nominee': office === 'Chancellor Nominee',
+        'sentenced': office === 'Sentenced'
       }
     },
     startGame () {
@@ -315,6 +322,11 @@ export default {
       })
       this.crowd[nominee].office = 'Chancellor Nominee'
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: this.crowd[nominee] })
+    },
+    nominateForDeath (nominee) {
+      this.clearChancellorNominee()
+      this.crowd[nominee].office = 'Sentenced'
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
     },
     clearChancellorNominee () {
       for (let x=0; x < this.crowd.length; x++) {
@@ -476,11 +488,13 @@ export default {
   background-size: 100%;
 }
 .president {
-  color: yellow;
   background: rebeccapurple;
 }
 .chancellor {
   background: orange 50%;
+}
+.sentenced {
+  background: yellow;
 }
 .chancellor-nominee {
   background: #ff2a54;
