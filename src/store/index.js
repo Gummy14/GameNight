@@ -13,7 +13,8 @@ export default new Vuex.Store({
     president: null,
     chancellor: null,
     chancellorNominee: null,
-    policies: []
+    policies: [],
+    failedGovernmentCount: 0
   },
   mutations: {
     setUser (state, payload) {
@@ -43,6 +44,9 @@ export default new Vuex.Store({
     setChancellorNominee (state, payload) {
       state.chancellorNominee = payload.ChancellorNominee
     },
+    setFailedGovernmentCount (state, payload) {
+      state.failedGovernmentCount = payload.FailedGovernmentCount
+    },
     clearStore (state) {
       state.user = undefined,
       state.crowd = [],
@@ -52,7 +56,8 @@ export default new Vuex.Store({
       state.policies = [],
       state.president = null,
       state.chancellor = null,
-      state.chancellorNominee = null
+      state.chancellorNominee = null,
+      state.failedGovernmentCount = 0
     }
   },
   actions: {
@@ -84,6 +89,9 @@ export default new Vuex.Store({
     },
     getChancellorNominee (state) {
       return state.chancellorNominee
+    },
+    getFailedGovernmentCount (state) {
+      return state.failedGovernmentCount
     }
   }
 })

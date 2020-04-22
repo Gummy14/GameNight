@@ -38,7 +38,7 @@ export default {
     }
   },
   computed: {
-    ...mapState({ user: 'user', crowd: 'crowd'}),
+    ...mapState({ user: 'user', crowd: 'crowd', failedGovernmentCount: 'failedGovernmentCount'}),
     isHitler() {
         if (this.user.isHitler === true) {
             return 'You ARE Hitler'
@@ -80,15 +80,15 @@ export default {
           break
         }
       }
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
       if (this.isElectionComplete) {
         this.countVotes()
+      } else {
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
       }
     },
     countVotes() {
       var yesVotes = 0
       var minimumVotesNeeded = Math.ceil((this.crowd.length/2))
-      console.log("it is calling countVotes")
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.crowd[x].vote === true) {
           yesVotes++
@@ -117,7 +117,12 @@ export default {
           pres = 0
       }
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'None'
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[pres], chancellorNominee: null })
+      firebase.firestore().collection('root').doc('game-room').update({ 
+        crowd: this.crowd, 
+        president: this.crowd[pres], 
+        chancellorNominee: null, 
+        failedGovernmentCount: this.failedGovernmentCount + 1 
+      })
     },
     failedGovernment () {
       for (let x = 0; x < this.crowd.length; x++) {

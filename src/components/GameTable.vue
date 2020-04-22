@@ -72,6 +72,21 @@
             </v-img>
           </v-card>
         </div>
+        <v-slider
+          v-model="failedGovernmentCount"
+          tick-size="9"
+          min="0"
+          max="3"
+          ticks
+          class="failed-government-tracker"
+          color="#fc5f4a"
+          track-color="#4267b2"
+          thumb-color="#4267b2"
+          thumb-label="always"
+          inverse-thumb
+          readonly
+        >
+        </v-slider>
 
         <v-btn dark class="start-button" @click="startGame">START GAME</v-btn>
         <h3 v-if="chancellorNominee != null"> The President has nominated {{ chancellorNominee.username }} for Chancellor</h3>
@@ -162,7 +177,8 @@ export default {
         president: null,
         chancellor: null,
         chancellorNominee: null,
-        policies: []
+        policies: [],
+        failedGovernmentCount: 0
       }
     };
   },
@@ -176,7 +192,8 @@ export default {
       policies: 'policies',
       president: 'president',
       chancellor: 'chancellor',
-      chancellorNominee: 'chancellorNominee'
+      chancellorNominee: 'chancellorNominee',
+      failedGovernmentCount: 'failedGovernmentCount'
     })
   },
   mounted () {
@@ -203,7 +220,6 @@ export default {
         self.$store.commit('setUser', {
           User: self.user
         })
-
       }
 
       self.$store.commit('setCrowd', {
@@ -236,6 +252,10 @@ export default {
 
       self.$store.commit('setPolicies', {
         Policies: doc.data().policies
+      })
+
+      self.$store.commit('setFailedGovernmentCount', {
+        FailedGovernmentCount: doc.data().failedGovernmentCount
       })
     })
   },
@@ -271,16 +291,16 @@ export default {
     addLiberalPolicy () {
       this.newTurn(1)
     },
+    addPolicy () {
+      firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
+      this.hand = []
+    },
     removePolicyFromDeck () {
       firebase.firestore().collection('root').doc('game-room').update({ deck: this.deck })
     },
     restoreDeck () {
       var deck = this.randomizeDeck()
       firebase.firestore().collection('root').doc('game-room').update({ deck: deck })
-    },
-    addPolicy () {
-      firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
-      this.hand = []
     },
     clearPolicies () {
       firebase.firestore().collection('root').doc('game-room').update({ policies: [] })
@@ -436,7 +456,7 @@ export default {
           pres = 0
       }
       return pres
-    },
+    }
   },
   watch: {
     discard() {
@@ -557,5 +577,12 @@ export default {
 .player-card {
   margin-left: 10px;
   max-width: 375px;
+}
+.failed-government-tracker {
+  position: relative;
+  top:-9.4%;
+  padding-left: 35.5%;
+  padding-right: 36.25%;
+  margin-bottom: -5%;
 }
 </style>
