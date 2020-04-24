@@ -8,7 +8,7 @@
           v-for="(player, index) in crowd"
           :key="index"
           :class="applyOffice(player.office)" >
-            <v-list-item v-if="user.office === 'President' && player.office != 'President'" @click="nominateChancellor(index)"> 
+            <v-list-item v-if="user.office === 'President' && player.office != 'President'" @click="nominateForDeath(index)"> 
               {{ player.username }}
               <v-spacer></v-spacer>
             </v-list-item>
@@ -304,8 +304,8 @@ export default {
       this.pickPresident(pick)
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
-      this.setUpDoc.crowd = this.crowd
       this.isGameOver = false
+      this.setUpDoc.crowd = this.clearGraveyard()
       this.setUpGame()
     },
     addFascistPolicy () {
@@ -335,6 +335,11 @@ export default {
       for (var x = 0; x < this.crowd.length; x++) {
         this.crowd[x].office = 'None'
       }
+    },
+    clearGraveyard () {
+      let survivors = []
+      survivors = this.crowd.concat(this.graveyard)
+      return survivors
     },
     handOff() {
       if (this.user.office === 'Chancellor') {
