@@ -22,6 +22,7 @@
         <v-card-actions>
             <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(true)">Vote Ja!</v-btn>
             <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
+            <v-btn outlined :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
         </v-card-actions>
     </div>
   </v-card>
@@ -34,11 +35,12 @@ export default {
   name: 'player-card',
   data() {
     return {
-      chancellorNomineeCrowdIndex: null
+      chancellorNomineeCrowdIndex: null,
+      deathNomineeCrowdIndex: null,
     }
   },
   computed: {
-    ...mapState({ user: 'user', crowd: 'crowd'}),
+    ...mapState({ user: 'user', crowd: 'crowd', graveyard: 'graveyard'}),
     isHitler() {
         if (this.user.isHitler === true) {
             return 'You ARE Hitler'
@@ -70,7 +72,7 @@ export default {
         }
       }
       return didEveryoneVote
-    },
+    }
   },
   methods: {
     vote(ballot) {
@@ -126,6 +128,24 @@ export default {
           break
         }
       }
+    },
+    isSentenced () {
+      this.crowd.forEach((element, index) => {
+        if (element.office === 'Sentenced') {
+            this.deathNomineeCrowdIndex = index
+          }
+        })
+    },
+    killPlayer () {
+        this.isSentenced()
+        let player = this.crowd[this.deathNomineeCrowdIndex]
+        console.log(this.crowd[this.deathNomineeCrowdIndex])
+        if (player.office === 'Sentenced') {
+            player.office = 'None'
+            this.graveyard.push(this.crowd[this.deathNomineeCrowdIndex])
+            this.crowd.splice(this.deathNomineeCrowdIndex, 1)
+        }
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, graveyard: this.graveyard })
     }
   }
 }
