@@ -72,6 +72,7 @@
             </v-img>
           </v-card>
         </div>
+
         <v-slider
           v-model="failedGovernmentCount"
           tick-size="9"
@@ -130,6 +131,11 @@
         </draggable>
         <v-btn dark @click="restoreDeck">Restore</v-btn>
       </div>
+
+      <v-dialog v-model="isGameOver" persistent max-width="290">
+        <game-over @newGame="startGame">
+        </game-over>
+      </v-dialog>
     </div>
   </div>
 </template>
@@ -139,11 +145,13 @@ import firebase from 'firebase'
 import draggable from 'vuedraggable'
 import { mapState } from 'vuex'
 import PlayerCard from './PlayerCard'
+import GameOver from './GameOver'
 export default {
   name: 'game-table',
   components: {
     draggable,
-    PlayerCard
+    PlayerCard,
+    GameOver
   },
   data() {
     return {
@@ -179,7 +187,8 @@ export default {
         chancellorNominee: null,
         policies: [],
         failedGovernmentCount: 0
-      }
+      },
+      isGameOver: false
     };
   },
   computed: {
@@ -241,10 +250,16 @@ export default {
       self.$store.commit('setFascistBoard', {
         FascistBoard: doc.data().fascistBoard
       })
+      if (doc.data().fascistBoard.length === 6) {
+        self.isGameOver = true
+      }
 
       self.$store.commit('setLiberalBoard', {
         LiberalBoard: doc.data().liberalBoard
       })
+      if (doc.data().liberalBoard.length === 5) {
+        self.isGameOver = true
+      }
 
       self.$store.commit('setDeck', {
         Deck: doc.data().deck
@@ -283,6 +298,7 @@ export default {
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
       this.setUpDoc.crowd = this.crowd
+      this.isGameOver = false
       this.setUpGame()
     },
     addFascistPolicy () {
