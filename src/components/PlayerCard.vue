@@ -135,7 +135,8 @@ export default {
         president: this.crowd[pres], 
         chancellorNominee: null,
         chancellor: null,
-        failedGovernmentCount: this.failedGovernmentCount + 1 === 3 ? 0 : this.failedGovernmentCount + 1
+        failedGovernmentCount: this.failedGovernmentCount + 1 === 3 ? 0 : this.failedGovernmentCount + 1,
+        graveyard: this.graveyard
       })
     },
     failedGovernment () {
@@ -167,15 +168,20 @@ export default {
         })
     },
     killPlayer () {
-        this.isSentenced()
-        let player = this.crowd[this.deathNomineeCrowdIndex]
-        console.log(this.crowd[this.deathNomineeCrowdIndex])
-        if (player.office === 'Sentenced') {
-            player.office = 'None'
-            this.graveyard.push(this.crowd[this.deathNomineeCrowdIndex])
-            this.crowd.splice(this.deathNomineeCrowdIndex, 1)
+      this.isSentenced()
+      let player = this.crowd[this.deathNomineeCrowdIndex]
+      if (player.office === 'Sentenced') {
+          player.office = 'None'
+          this.graveyard.push(this.crowd[this.deathNomineeCrowdIndex])
+          this.crowd.splice(this.deathNomineeCrowdIndex, 1)
+      }
+      for (let x = 0; x < this.crowd.length; x++) {
+        if (this.crowd[x].office === 'President') {
+          this.changePresident(x)
+          break
         }
-        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, graveyard: this.graveyard })
+      }
+      //firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, graveyard: this.graveyard })
     }
   }
 }

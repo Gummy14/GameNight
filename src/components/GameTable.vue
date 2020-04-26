@@ -280,6 +280,9 @@ export default {
       self.$store.commit('setFailedGovernmentCount', {
         FailedGovernmentCount: doc.data().failedGovernmentCount
       })
+      if (doc.data().graveyard.length > self.graveyard) {
+        self.needToKillPlayer = false
+      }
       self.$store.commit('setGraveyard', {
         Graveyard: doc.data().graveyard
       })
