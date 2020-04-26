@@ -114,6 +114,17 @@
           </v-card>
         </draggable>
         <v-btn dark @click="restoreDeck">Restore</v-btn>
+        <v-divider></v-divider>
+        <v-btn dark @click="peekCards">PEEK</v-btn>
+          <transition-group name="fade" tag="ul" class="deck-stack">
+              <v-card
+                dark
+                :class="applyClass(element.type)" 
+                v-for="(element) in peekDeck"
+                :key="element.id"
+              > 
+              </v-card>
+            </transition-group>
       </div>
     </div>
   </div>
@@ -151,6 +162,7 @@ export default {
         { name: "POLICY", type: 0, id: 15 },
         { name: "POLICY", type: 0, id: 16 },
       ],
+      peekDeck: [],
       hand: [],
       discard: [],
       hasDiscarded: false,
@@ -454,6 +466,14 @@ export default {
       }
       return pres
     },
+    peekCards () {
+      this.peekDeck = {
+        1: this.deck[this.deck.length - 4],
+        2: this.deck[this.deck.length - 3],
+        3: this.deck[this.deck.length - 2]
+      }
+      console.log(this.peekDeck)
+    }
   },
   watch: {
     discard() {
@@ -576,5 +596,14 @@ export default {
 .player-card {
   margin-left: 10px;
   max-width: 375px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .75s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  margin-top: 100px;
 }
 </style>

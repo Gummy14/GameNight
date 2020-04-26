@@ -139,7 +139,6 @@ export default {
     killPlayer () {
         this.isSentenced()
         let player = this.crowd[this.deathNomineeCrowdIndex]
-        console.log(this.crowd[this.deathNomineeCrowdIndex])
         if (player.office === 'Sentenced') {
             player.office = 'None'
             this.graveyard.push(this.crowd[this.deathNomineeCrowdIndex])
