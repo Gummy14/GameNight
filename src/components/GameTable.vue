@@ -8,7 +8,11 @@
           v-for="(player, index) in crowd"
           :key="index"
           :class="applyOffice(player.office)" >
-            <v-list-item v-if="user.office === 'President' && player.office != 'President'" @click="nominateForDeath(index)"> 
+            <v-list-item v-if="user.office === 'President' && player.office != 'President' && !needToKillPlayer" @click="nominateChancellor(index)"> 
+              {{ player.username }}
+              <v-spacer></v-spacer>
+            </v-list-item>
+            <v-list-item v-else-if="user.office === 'President' && player.office != 'President' && needToKillPlayer" @click="nominateForDeath(index)"> 
               {{ player.username }}
               <v-spacer></v-spacer>
             </v-list-item>
@@ -190,7 +194,8 @@ export default {
         graveyard: [],
         failedGovernmentCount: 0
       },
-      isGameOver: false
+      isGameOver: false,
+      needToKillPlayer: false
     };
   },
   computed: {
@@ -337,9 +342,15 @@ export default {
       }
     },
     clearGraveyard () {
-      let survivors = []
-      survivors = this.crowd.concat(this.graveyard)
-      return survivors
+      var deadplayers = this.graveyard
+      if (deadplayers.length > 0) {
+        self.$store.commit('setGraveyard', {
+          Graveyard: []
+        })
+        return this.crowd.concat(deadplayers)
+      } else {
+        return this.crowd
+      }
     },
     handOff() {
       if (this.user.office === 'Chancellor') {
@@ -460,20 +471,24 @@ export default {
       return roleSet
     },
     newTurn (policyAdded) {
-      this.policyEnacted = false
-      var currentPresident
-      for (let r = 0; r < this.crowd.length; r++) {
-        if (this.president.userId === this.crowd[r].userId) {
-          currentPresident = r
-          break;
+      if (policyAdded === 0 && (this.fascistBoard.length === 4 || this.fascistBoard.length === 5)) {
+        this.needToKillPlayer = true
+        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+      } else {
+        var currentPresident
+        for (let r = 0; r < this.crowd.length; r++) {
+          if (this.president.userId === this.crowd[r].userId) {
+            currentPresident = r
+            break;
+          }
         }
-      }
-      var newPresident = this.changePresident(currentPresident)
-      this.clearChancellorNominee()
-      if (policyAdded === 0) {
-        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, fascistBoard: this.fascistBoard })
-      } else if (policyAdded === 1) {
-        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, liberalBoard: this.liberalBoard })
+        var newPresident = this.changePresident(currentPresident)
+        this.clearChancellorNominee()
+        if (policyAdded === 0) {
+          firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, fascistBoard: this.fascistBoard })
+        } else if (policyAdded === 1) {
+          firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, liberalBoard: this.liberalBoard })
+        }
       }
     },
     changePresident (player) {
