@@ -117,7 +117,9 @@ export default {
     changePresident (player) {
       var lastPlayer = this.crowd.length - 1
       var pres = null
-      this.crowd[this.chancellorNomineeCrowdIndex].office = 'None'
+      if (this.chancellorNomineeCrowdIndex != null) {
+        this.crowd[this.chancellorNomineeCrowdIndex].office = 'None'
+      }
       if (player != lastPlayer) {
           this.crowd[player].office = 'None'
           this.crowd[player + 1].office = 'President'
@@ -171,9 +173,9 @@ export default {
       this.isSentenced()
       let player = this.crowd[this.deathNomineeCrowdIndex]
       if (player.office === 'Sentenced') {
-          player.office = 'None'
-          this.graveyard.push(this.crowd[this.deathNomineeCrowdIndex])
-          this.crowd.splice(this.deathNomineeCrowdIndex, 1)
+        player.office = 'None'
+        this.graveyard.push(this.crowd[this.deathNomineeCrowdIndex])
+        this.crowd.splice(this.deathNomineeCrowdIndex, 1)
       }
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.crowd[x].office === 'President') {
@@ -181,7 +183,6 @@ export default {
           break
         }
       }
-      //firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, graveyard: this.graveyard })
     }
   }
 }

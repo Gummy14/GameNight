@@ -307,6 +307,7 @@ export default {
     startGame () {
       var pick = Math.floor(Math.random() * (this.crowd.length))
       this.hand = []
+      this.needToKillPlayer = false
       this.clearOffices()
       this.assignRoles()
       this.pickPresident(pick)
@@ -347,7 +348,7 @@ export default {
     clearGraveyard () {
       var deadplayers = this.graveyard
       if (deadplayers.length > 0) {
-        self.$store.commit('setGraveyard', {
+        this.$store.commit('setGraveyard', {
           Graveyard: []
         })
         return this.crowd.concat(deadplayers)
