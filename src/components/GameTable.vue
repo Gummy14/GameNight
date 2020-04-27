@@ -123,7 +123,7 @@
           <transition-group name="fade" tag="ul" class="deck-stack">
               <v-card
                 dark
-                :class="applyClass(element.type)" 
+                :class="applyClass(element.type)"
                 v-for="(element) in peekDeck"
                 :key="element.id"
               > 
