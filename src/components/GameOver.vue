@@ -20,7 +20,8 @@ export default {
   computed: {
     ...mapState({ 
       fascistBoard: 'fascistBoard',
-      liberalBoard: 'liberalBoard'
+      liberalBoard: 'liberalBoard',
+      graveyard: 'graveyard'
     }),
     gameWinner () {
         var outcome
@@ -36,6 +37,12 @@ export default {
           description: 'The liberals have successfully passed enough policies to starve off fascism for now. \nPeace may be achievable after all.'
         }
         return outcome
+      } else if (this.isHitlerDead) {
+        outcome = {
+          victoryType: 'Hitler has been killed!',
+          description: 'Hitler has died! \nThe fascists are now aimless without their leader.'
+        }
+        return outcome
       } else {
         outcome = {
           victoryType: '',
@@ -43,6 +50,14 @@ export default {
         }
         return outcome
       }
+    },
+    isHitlerDead () {
+      for (let a = 0; a < this.graveyard.length; a++) {
+        if (this.graveyard[a].isHitler) {
+          return true
+        }
+      }
+      return false
     }
   },
   methods: {

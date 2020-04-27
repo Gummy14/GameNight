@@ -299,6 +299,11 @@ export default {
       self.$store.commit('setGraveyard', {
         Graveyard: doc.data().graveyard
       })
+      for (let a = 0; a < doc.data().graveyard.length; a++) {
+        if (doc.data().graveyard[a].isHitler) {
+          self.isGameOver = true
+        }
+      }
     })
   },
   methods: {
