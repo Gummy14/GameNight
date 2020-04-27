@@ -119,7 +119,7 @@
                 Hand off cards
               </v-btn>
             </v-card>
-            <player-card class="player-card"> </player-card>
+            <player-card @investigationComplete="setInvestigationResults($event, true)" class="player-card"> </player-card>
           </div>
           <player-card v-else class="player-hand player-card"> </player-card>
       </div>
@@ -336,6 +336,7 @@ export default {
       this.hand = []
       this.needToKillPlayer = false
       this.needToPeekCards = false
+      this.needToInvestigatePlayer = false
       this.clearOffices()
       this.assignRoles()
       this.pickPresident(pick)
