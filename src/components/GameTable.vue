@@ -482,10 +482,14 @@ export default {
       return pres
     },
     peekCards () {
-      this.peekDeck = {
-        1: this.deck[this.deck.length - 4],
-        2: this.deck[this.deck.length - 3],
-        3: this.deck[this.deck.length - 2]
+      if (this.peekDeck.length > 0) {
+        this.peekDeck = []
+      } else {
+        this.peekDeck = {
+          1: this.deck[this.deck.length - 3],
+          2: this.deck[this.deck.length - 2],
+          3: this.deck[this.deck.length - 1]
+        }
       }
       console.log(this.peekDeck)
     }
@@ -515,9 +519,9 @@ export default {
   transform: translate(-50%, -50%);
 }
 .policy {
-  width: 85px;
+  width: 88px;
   height: 125px;
-  margin-right: 10px;
+  margin-right: 8.5px;
 }
 .fascist{
   background-image: url("../assets/fascist-card.png");
@@ -546,7 +550,7 @@ export default {
 }
 .liberal-board {
   height: 150px;
-  margin: 70px 120px auto 120px;
+  margin: 69px 100px auto 120px;
   display: flex;
 }
 .board {
@@ -619,6 +623,5 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
-  margin-top: 100px;
 }
 </style>
