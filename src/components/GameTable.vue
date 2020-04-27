@@ -135,7 +135,7 @@
         </draggable>
         <v-btn dark @click="restoreDeck">Restore</v-btn>
         <v-divider></v-divider>
-        <v-btn dark @click="peekCards">PEEK</v-btn>
+        <v-btn v-if="needToPeekCards && user.office === 'President'" dark @click="peekCards">Examine</v-btn>
           <transition-group name="fade" tag="ul" class="deck-stack">
               <v-card
                 dark
@@ -207,7 +207,8 @@ export default {
         failedGovernmentCount: 0
       },
       isGameOver: false,
-      needToKillPlayer: false
+      needToKillPlayer: false,
+      needToPeekCards: false
     };
   },
   computed: {
@@ -320,6 +321,7 @@ export default {
       var pick = Math.floor(Math.random() * (this.crowd.length))
       this.hand = []
       this.needToKillPlayer = false
+      this.needToPeekCards = false
       this.clearOffices()
       this.assignRoles()
       this.pickPresident(pick)
@@ -487,49 +489,52 @@ export default {
       return roleSet
     },
     newTurn (policyAdded) {
-      if (policyAdded === 0 && (this.fascistBoard.length === 4 || this.fascistBoard.length === 5)) {
+      if (policyAdded === 0 && (this.fascistBoard.length === 3)) {
+        this.needToPeekCards = true
+        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+      } else if (policyAdded === 0 && (this.fascistBoard.length === 4 || this.fascistBoard.length === 5)) {
         this.needToKillPlayer = true
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
       } else {
-        var currentPresident
+        var newPresident = this.newPresident(this.getPresident())
+        this.clearChancellorNominee()
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, fascistBoard: this.fascistBoard, liberalBoard: this.liberalBoard })
+      }
+    },
+    getPresident() {
+      var currentPresident
         for (let r = 0; r < this.crowd.length; r++) {
           if (this.president.userId === this.crowd[r].userId) {
             currentPresident = r
             break;
           }
         }
-        var newPresident = this.changePresident(currentPresident)
-        this.clearChancellorNominee()
-        if (policyAdded === 0) {
-          firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, fascistBoard: this.fascistBoard })
-        } else if (policyAdded === 1) {
-          firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, liberalBoard: this.liberalBoard })
-        }
-      }
+        // var newPresident = this.newPresident(currentPresident)
+        return currentPresident
+        // this.clearChancellorNominee()
     },
-    changePresident (player) {
+    newPresident (player) {
       var lastPlayerInCrowd = this.crowd.length - 1
-      var pres = null
+      var president = null
       if (player != lastPlayerInCrowd) {
           this.crowd[player].office = 'None'
           this.crowd[player + 1].office = 'President'
-          pres = player + 1
+          president = player + 1
       } else {
           this.crowd[player].office = 'None'
           this.crowd[0].office = 'President'
-          pres = 0
+          president = 0
       }
-      return pres
+      return president
     },
     peekCards () {
       if (this.peekDeck.length > 0) {
         this.peekDeck = []
+        var newPresident = this.newPresident(this.getPresident())
+        this.clearChancellorNominee()
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null })
       } else {
-        this.peekDeck = {
-          1: this.deck[this.deck.length - 3],
-          2: this.deck[this.deck.length - 2],
-          3: this.deck[this.deck.length - 1]
-        }
+        this.peekDeck.push(this.deck[this.deck.length-3], this.deck[this.deck.length-2], this.deck[this.deck.length-1])
       }
       console.log(this.peekDeck)
     }
@@ -658,7 +663,7 @@ export default {
 }
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity .75s;
+  transition: opacity 2s;
 }
 .fade-enter,
 .fade-leave-to {
