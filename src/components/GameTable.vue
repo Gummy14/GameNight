@@ -4,22 +4,25 @@
       <v-list>
         <v-subheader class="space">PLAYERS</v-subheader>
         <v-divider></v-divider>
-        <div
-          v-for="(player, index) in crowd"
-          :key="index"
-          :class="applyOffice(player.office)" >
-            <v-list-item v-if="user.office === 'President' && player.office != 'President' && !needToKillPlayer" @click="nominateChancellor(index)"> 
+        <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player.office)">
+          <div v-if="user.office === 'President' && player.office != 'President'">
+            <v-list-item  v-if="!needToKillPlayer && !needToInvestigatePlayer" @click="nominate(index, 'Chancellor Nominee')"> 
               {{ player.username }}
               <v-spacer></v-spacer>
             </v-list-item>
-            <v-list-item v-else-if="user.office === 'President' && player.office != 'President' && needToKillPlayer" @click="nominateForDeath(index)"> 
+            <v-list-item v-else-if="needToKillPlayer" @click="nominate(index, 'Sentenced')"> 
               {{ player.username }}
               <v-spacer></v-spacer>
             </v-list-item>
-            <v-list-item v-else> 
+            <v-list-item v-else-if="needToInvestigatePlayer" @click="nominate(index, 'Under Investigation')"> 
               {{ player.username }}
               <v-spacer></v-spacer>
             </v-list-item>
+          </div>
+          <v-list-item v-else> 
+            {{ player.username }}
+            <v-spacer></v-spacer>
+          </v-list-item>
           <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
           </div>
       </v-list>
@@ -84,7 +87,6 @@
           max="3"
           ticks
           class="failed-government-tracker"
-          color="#fc5f4a"
           track-color="#4267b2"
           thumb-color="#4267b2"
           thumb-label="always"
@@ -146,10 +148,13 @@
               </v-card>
             </transition-group>
       </div>
-
       <v-dialog v-model="isGameOver" persistent max-width="290">
         <game-over @newGame="startGame">
         </game-over>
+      </v-dialog>
+      <v-dialog v-model="isInvestigationOver" persistent max-width="290">
+        <investigation-results :player="investigationResults" @investigationOver="setInvestigationResults(null, false)">
+        </investigation-results>
       </v-dialog>
     </div>
   </div>
@@ -161,12 +166,14 @@ import draggable from 'vuedraggable'
 import { mapState } from 'vuex'
 import PlayerCard from './PlayerCard'
 import GameOver from './GameOver'
+import InvestigationResults from './InvestigationResults'
 export default {
   name: 'game-table',
   components: {
     draggable,
     PlayerCard,
-    GameOver
+    GameOver,
+    InvestigationResults
   },
   data() {
     return {
@@ -207,8 +214,11 @@ export default {
         failedGovernmentCount: 0
       },
       isGameOver: false,
+      isInvestigationOver: false,
+      investigationResults: null,
       needToKillPlayer: false,
-      needToPeekCards: false
+      needToPeekCards: false,
+      needToInvestigatePlayer: false
     };
   },
   computed: {
@@ -295,15 +305,13 @@ export default {
       })
       if (doc.data().graveyard.length > self.graveyard) {
         self.needToKillPlayer = false
+        if (doc.data().graveyard[doc.data().graveyard.length-1].isHitler) {
+          self.isGameOver = true
+        }
       }
       self.$store.commit('setGraveyard', {
         Graveyard: doc.data().graveyard
       })
-      for (let a = 0; a < doc.data().graveyard.length; a++) {
-        if (doc.data().graveyard[a].isHitler) {
-          self.isGameOver = true
-        }
-      }
     })
   },
   methods: {
@@ -319,7 +327,8 @@ export default {
         'president': office === 'President',
         'chancellor': office === 'Chancellor',
         'chancellor-nominee': office === 'Chancellor Nominee',
-        'sentenced': office === 'Sentenced'
+        'sentenced': office === 'Sentenced',
+        'under-investigation': office === 'Under Investigation'
       }
     },
     startGame () {
@@ -390,20 +399,19 @@ export default {
       }
       return this.defaultDeck
     },
-    nominateChancellor (nominee) {
-      this.clearChancellorNominee()
+    nominate(nominee, nomination) {
+      this.clearNominees()
       this.crowd.forEach(element => {
         element.vote = null
       })
-      this.crowd[nominee].office = 'Chancellor Nominee'
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: this.crowd[nominee] })
+      this.crowd[nominee].office = nomination
+      if (nomination === 'Chancellor Nominee') {
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: this.crowd[nominee] })
+      } else {
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+      }
     },
-    nominateForDeath (nominee) {
-      this.clearChancellorNominee()
-      this.crowd[nominee].office = 'Sentenced'
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
-    },
-    clearChancellorNominee () {
+    clearNominees () {
       for (let x=0; x < this.crowd.length; x++) {
         if (this.crowd[x].office != 'President') {
           this.crowd[x].office = 'None'
@@ -494,15 +502,34 @@ export default {
       return roleSet
     },
     newTurn (policyAdded) {
-      if (policyAdded === 0 && (this.fascistBoard.length === 3)) {
+      // if (policyAdded === 0 && (this.fascistBoard.length === 1) && (this.crowd.length >= 9)) {
+        if (policyAdded === 0 && (this.fascistBoard.length === 1) && (this.crowd.length >= 1)) {
+        //investigate player
+        this.needToInvestigatePlayer = true
+        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+
+      } else if (policyAdded === 0 && (this.fascistBoard.length === 2) && (this.crowd.length >= 7)) {
+        //investigate player
+        this.needToInvestigatePlayer = true
+        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+
+      } else if (policyAdded === 0 && (this.fascistBoard.length === 3) && (this.crowd.length >= 7)) {
+        //president picks new president
+
+      } else if (policyAdded === 0 && (this.fascistBoard.length === 3) && (this.crowd.length === 5 || this.crowd.length === 6)) {
+        //president peaks at top 3 polices
         this.needToPeekCards = true
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+
       } else if (policyAdded === 0 && (this.fascistBoard.length === 4 || this.fascistBoard.length === 5)) {
+        //president kills someone
         this.needToKillPlayer = true
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+
       } else {
+        //president takes no action
         var newPresident = this.newPresident(this.getPresident())
-        this.clearChancellorNominee()
+        this.clearNominees()
         firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, fascistBoard: this.fascistBoard, liberalBoard: this.liberalBoard })
       }
     },
@@ -514,9 +541,7 @@ export default {
             break;
           }
         }
-        // var newPresident = this.newPresident(currentPresident)
         return currentPresident
-        // this.clearChancellorNominee()
     },
     newPresident (player) {
       var lastPlayerInCrowd = this.crowd.length - 1
@@ -536,12 +561,20 @@ export default {
       if (this.peekDeck.length > 0) {
         this.peekDeck = []
         var newPresident = this.newPresident(this.getPresident())
-        this.clearChancellorNominee()
+        this.clearNominees()
         firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null })
       } else {
         this.peekDeck.push(this.deck[this.deck.length-3], this.deck[this.deck.length-2], this.deck[this.deck.length-1])
       }
-      console.log(this.peekDeck)
+    },
+    setInvestigationResults (player, status) {
+      this.isInvestigationOver = status
+      this.investigationResults = player
+      if (!status) {
+        var newPresident = this.newPresident(this.getPresident())
+        this.clearNominees()
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null })
+      }
     }
   },
   watch: {
@@ -592,6 +625,9 @@ export default {
 }
 .chancellor-nominee {
   background: #ff2a54;
+}
+.under-investigation {
+  background: #2aff4e;
 }
 .fascist-board {
   height: 125px;

@@ -5,7 +5,7 @@
             <v-list-item-content>
                 <v-list-item-title class="headline mb-1 text-wrap"> {{ user.username}} </v-list-item-title>
                 <v-list-item-title class="headline mb-1">{{ user.party }}</v-list-item-title>
-                <v-list-item-subtitle>{{isHitler}}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ isHitler }}</v-list-item-subtitle>
             </v-list-item-content> 
             <v-list-item-avatar
                 tile
@@ -23,6 +23,7 @@
             <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(true)">Vote Ja!</v-btn>
             <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
             <v-btn outlined :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
+            <v-btn outlined :disabled="this.user.office != 'President'" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
         </v-card-actions>
     </div>
   </v-card>
@@ -35,8 +36,7 @@ export default {
   name: 'player-card',
   data() {
     return {
-      chancellorNomineeCrowdIndex: null,
-      deathNomineeCrowdIndex: null,
+      chancellorNomineeCrowdIndex: null
     }
   },
   computed: {
@@ -50,11 +50,11 @@ export default {
       graveyard: 'graveyard'
       }),
     isHitler() {
-        if (this.user.isHitler === true) {
-            return 'You ARE Hitler'
-        } else {
-            return 'You ARE NOT Hitler'
-        }
+      if (this.user.isHitler === true) {
+          return 'You ARE Hitler'
+      } else {
+          return 'You ARE NOT Hitler'
+      }
     },
     chancellorNominee () {
       var doesChancellorNomineeExist = false
@@ -162,20 +162,21 @@ export default {
         this.liberalBoard.push(topPolicy)
       }
     },
-    isSentenced () {
-      this.crowd.forEach((element, index) => {
-        if (element.office === 'Sentenced') {
-            this.deathNomineeCrowdIndex = index
-          }
-        })
+    getOffice (office) {
+      for (let c = 0; c < this.crowd.length; c ++) {
+        if (this.crowd[c].office === office) {
+          return c
+        }
+      }
+      return -1
     },
     killPlayer () {
-      this.isSentenced()
-      let player = this.crowd[this.deathNomineeCrowdIndex]
+      var crowdIndex = this.getOffice('Sentenced')
+      let player = this.crowd[crowdIndex]
       if (player.office === 'Sentenced') {
         player.office = 'None'
-        this.graveyard.push(this.crowd[this.deathNomineeCrowdIndex])
-        this.crowd.splice(this.deathNomineeCrowdIndex, 1)
+        this.graveyard.push(this.crowd[crowdIndex])
+        this.crowd.splice(crowdIndex, 1)
       }
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.crowd[x].office === 'President') {
@@ -183,6 +184,10 @@ export default {
           break
         }
       }
+    },
+    investigatePlayer () {
+      var crowdIndex = this.getOffice('Under Investigation')
+      this.$emit('investigationComplete', this.crowd[crowdIndex])
     }
   }
 }
