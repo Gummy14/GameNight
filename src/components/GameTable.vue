@@ -32,7 +32,7 @@
       <div class="small-board">
         <v-card-title class="title">Discard</v-card-title>
         <v-card dark>
-          <draggable class="discard-stack" :list="discard" group="cards">
+          <draggable class="discard-stack" :list="discard" group="cards" @change="discardedPolicy">
           </draggable>
         </v-card>
       </div>
@@ -45,7 +45,7 @@
                 class="fascist-board" 
                 :list="fascistBoard" 
                 group="cards" 
-                @change="addFascistPolicy" 
+                @change="newTurn(0)" 
                 :disabled="user.office != 'Chancellor' || hand.length != 1"
               >
                 <v-card
@@ -66,7 +66,7 @@
                 class="liberal-board" 
                 :list="liberalBoard" 
                 group="cards" 
-                @change="addLiberalPolicy"
+                @change="newTurn(1)"
                 :disabled="user.office != 'Chancellor' || hand.length != 1"
               >
                 <v-card
@@ -345,12 +345,6 @@ export default {
       this.setUpDoc.crowd = this.clearGraveyard()
       this.setUpGame()
     },
-    addFascistPolicy () {
-      this.newTurn(0)
-    },
-    addLiberalPolicy () {
-      this.newTurn(1)
-    },
     addPolicy () {
       firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
       this.hand = []
@@ -502,8 +496,7 @@ export default {
       return roleSet
     },
     newTurn (policyAdded) {
-      // if (policyAdded === 0 && (this.fascistBoard.length === 1) && (this.crowd.length >= 9)) {
-        if (policyAdded === 0 && (this.fascistBoard.length === 1) && (this.crowd.length >= 1)) {
+      if (policyAdded === 0 && (this.fascistBoard.length === 1) && (this.crowd.length >= 9)) {
         //investigate player
         this.needToInvestigatePlayer = true
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
@@ -528,9 +521,7 @@ export default {
 
       } else {
         //president takes no action
-        var newPresident = this.newPresident(this.getPresident())
-        this.clearNominees()
-        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, fascistBoard: this.fascistBoard, liberalBoard: this.liberalBoard })
+        this.movePresidentToNextPlayer()
       }
     },
     getPresident() {
@@ -560,9 +551,7 @@ export default {
     peekCards () {
       if (this.peekDeck.length > 0) {
         this.peekDeck = []
-        var newPresident = this.newPresident(this.getPresident())
-        this.clearNominees()
-        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null })
+        this.movePresidentToNextPlayer()
       } else {
         this.peekDeck.push(this.deck[this.deck.length-3], this.deck[this.deck.length-2], this.deck[this.deck.length-1])
       }
@@ -571,18 +560,19 @@ export default {
       this.isInvestigationOver = status
       this.investigationResults = player
       if (!status) {
-        var newPresident = this.newPresident(this.getPresident())
-        this.clearNominees()
-        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null })
+        this.movePresidentToNextPlayer()
       }
-    }
-  },
-  watch: {
-    discard() {
+    },
+    discardedPolicy() {
       this.hasDiscarded = true
       if (this.user.office === 'Chancellor') {
         this.clearPolicies()
       }
+    },
+    movePresidentToNextPlayer () {
+      var newPresident = this.newPresident(this.getPresident())
+      this.clearNominees()
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[newPresident], chancellorNominee: null, chancellor: null, fascistBoard: this.fascistBoard, liberalBoard: this.liberalBoard })
     }
   }
 }
