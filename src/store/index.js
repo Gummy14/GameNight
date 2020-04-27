@@ -14,6 +14,7 @@ export default new Vuex.Store({
     chancellor: null,
     chancellorNominee: null,
     policies: [],
+    failedGovernmentCount: 0,
     graveyard: []
   },
   mutations: {
@@ -44,6 +45,9 @@ export default new Vuex.Store({
     setChancellorNominee (state, payload) {
       state.chancellorNominee = payload.ChancellorNominee
     },
+    setFailedGovernmentCount (state, payload) {
+      state.failedGovernmentCount = payload.FailedGovernmentCount
+    },
     setGraveyard (state, payload) {
       state.graveyard = payload.Graveyard
     },
@@ -57,6 +61,7 @@ export default new Vuex.Store({
       state.president = null,
       state.chancellor = null,
       state.chancellorNominee = null,
+      state.failedGovernmentCount = 0,
       state.graveyard = []
     }
   },
@@ -89,6 +94,9 @@ export default new Vuex.Store({
     },
     getChancellorNominee (state) {
       return state.chancellorNominee
+    },
+    getFailedGovernmentCount (state) {
+      return state.failedGovernmentCount
     },
     getGraveyard (state) {
       return state.graveyard

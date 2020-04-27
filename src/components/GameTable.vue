@@ -63,7 +63,7 @@
                 class="liberal-board" 
                 :list="liberalBoard" 
                 group="cards" 
-                @change="addLiberalPolicy" 
+                @change="addLiberalPolicy"
                 :disabled="user.office != 'Chancellor' || hand.length != 1"
               >
                 <v-card
@@ -76,6 +76,22 @@
             </v-img>
           </v-card>
         </div>
+
+        <v-slider
+          v-model="failedGovernmentCount"
+          tick-size="9"
+          min="0"
+          max="3"
+          ticks
+          class="failed-government-tracker"
+          color="#fc5f4a"
+          track-color="#4267b2"
+          thumb-color="#4267b2"
+          thumb-label="always"
+          inverse-thumb
+          readonly
+        >
+        </v-slider>
 
         <v-btn dark class="start-button" @click="startGame">START GAME</v-btn>
         <h3 v-if="chancellorNominee != null"> The President has nominated {{ chancellorNominee.username }} for Chancellor</h3>
@@ -130,6 +146,11 @@
               </v-card>
             </transition-group>
       </div>
+
+      <v-dialog v-model="isGameOver" persistent max-width="290">
+        <game-over @newGame="startGame">
+        </game-over>
+      </v-dialog>
     </div>
   </div>
 </template>
@@ -139,11 +160,13 @@ import firebase from 'firebase'
 import draggable from 'vuedraggable'
 import { mapState } from 'vuex'
 import PlayerCard from './PlayerCard'
+import GameOver from './GameOver'
 export default {
   name: 'game-table',
   components: {
     draggable,
-    PlayerCard
+    PlayerCard,
+    GameOver
   },
   data() {
     return {
@@ -180,8 +203,10 @@ export default {
         chancellor: null,
         chancellorNominee: null,
         policies: [],
-        graveyard: []
+        graveyard: [],
+        failedGovernmentCount: 0
       },
+      isGameOver: false,
       needToKillPlayer: false
     };
   },
@@ -196,6 +221,7 @@ export default {
       president: 'president',
       chancellor: 'chancellor',
       chancellorNominee: 'chancellorNominee',
+      failedGovernmentCount: 'failedGovernmentCount',
       graveyard: 'graveyard'
     })
   },
@@ -244,10 +270,16 @@ export default {
       self.$store.commit('setFascistBoard', {
         FascistBoard: doc.data().fascistBoard
       })
+      if (doc.data().fascistBoard.length === 6) {
+        self.isGameOver = true
+      }
 
       self.$store.commit('setLiberalBoard', {
         LiberalBoard: doc.data().liberalBoard
       })
+      if (doc.data().liberalBoard.length === 5) {
+        self.isGameOver = true
+      }
 
       self.$store.commit('setDeck', {
         Deck: doc.data().deck
@@ -257,6 +289,12 @@ export default {
         Policies: doc.data().policies
       })
 
+      self.$store.commit('setFailedGovernmentCount', {
+        FailedGovernmentCount: doc.data().failedGovernmentCount
+      })
+      if (doc.data().graveyard.length > self.graveyard) {
+        self.needToKillPlayer = false
+      }
       self.$store.commit('setGraveyard', {
         Graveyard: doc.data().graveyard
       })
@@ -281,11 +319,13 @@ export default {
     startGame () {
       var pick = Math.floor(Math.random() * (this.crowd.length))
       this.hand = []
+      this.needToKillPlayer = false
       this.clearOffices()
       this.assignRoles()
       this.pickPresident(pick)
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
+      this.isGameOver = false
       this.setUpDoc.crowd = this.clearGraveyard()
       this.setUpGame()
     },
@@ -295,16 +335,16 @@ export default {
     addLiberalPolicy () {
       this.newTurn(1)
     },
+    addPolicy () {
+      firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
+      this.hand = []
+    },
     removePolicyFromDeck () {
       firebase.firestore().collection('root').doc('game-room').update({ deck: this.deck })
     },
     restoreDeck () {
       var deck = this.randomizeDeck()
       firebase.firestore().collection('root').doc('game-room').update({ deck: deck })
-    },
-    addPolicy () {
-      firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
-      this.hand = []
     },
     clearPolicies () {
       firebase.firestore().collection('root').doc('game-room').update({ policies: [] })
@@ -320,7 +360,7 @@ export default {
     clearGraveyard () {
       var deadplayers = this.graveyard
       if (deadplayers.length > 0) {
-        self.$store.commit('setGraveyard', {
+        this.$store.commit('setGraveyard', {
           Graveyard: []
         })
         return this.crowd.concat(deadplayers)
@@ -623,5 +663,12 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+.failed-government-tracker {
+  position: relative;
+  top:-9.5%;
+  padding-left: 35.45%;
+  padding-right: 36.25%;
+  margin-bottom: -5%;
 }
 </style>
