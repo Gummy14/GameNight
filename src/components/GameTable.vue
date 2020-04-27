@@ -263,6 +263,10 @@ export default {
       self.$store.commit('setChancellor', {
         Chancellor: doc.data().chancellor
       })
+      if (doc.data().chancellor.isHitler && self.fascistBoard.length >= 3) {
+        console.log(self.chancellor)
+        self.isGameOver = true
+      }
 
       self.$store.commit('setChancellorNominee', {
         ChancellorNominee: doc.data().chancellorNominee
@@ -432,6 +436,9 @@ export default {
       })
 
       switch(this.crowd.length) {
+        // case 3:
+        //   roleSet = this.createRoleSet(roleSet, 2, 0)
+        //   break
         case 5:
           roleSet = this.createRoleSet(roleSet, 3, 1)
           break

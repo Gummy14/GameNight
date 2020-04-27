@@ -43,7 +43,14 @@ export default {
           description: 'Hitler has died! \nThe fascists are now aimless without their leader.'
         }
         return outcome
-      } else {
+      } else if (this.chancellor.isHitler) {
+        outcome = {
+          victoryType: 'Hitler has been elected Chancellor!',
+          description: 'A sad day for democracy. This is how liberty dies... with thunderous applause'
+        }
+        return outcome
+      }
+        else {
         outcome = {
           victoryType: '',
           description: ''
