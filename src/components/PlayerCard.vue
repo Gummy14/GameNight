@@ -36,7 +36,8 @@ export default {
   name: 'player-card',
   data() {
     return {
-      chancellorNomineeCrowdIndex: null
+      chancellorNomineeCrowdIndex: null,
+      didFailGovernment: false
     }
   },
   computed: {
@@ -132,6 +133,15 @@ export default {
           this.crowd[0].office = 'President'
           pres = 0
       }
+
+      var totalFailedGovernments
+      if (this.didFailGovernment) {
+        totalFailedGovernments = this.failedGovernmentCount + 1 === 3 ? 0 : this.failedGovernmentCount + 1
+      } else {
+        totalFailedGovernments = this.failedGovernmentCount
+      }
+      this.didFailGovernment = false
+
       firebase.firestore().collection('root').doc('game-room').update({ 
         crowd: this.crowd, 
         deck: this.deck,
@@ -140,11 +150,12 @@ export default {
         president: this.crowd[pres], 
         chancellorNominee: null,
         chancellor: null,
-        failedGovernmentCount: this.failedGovernmentCount + 1 === 3 ? 0 : this.failedGovernmentCount + 1,
+        failedGovernmentCount: totalFailedGovernments,
         graveyard: this.graveyard
       })
     },
     failedGovernment () {
+      this.didFailGovernment = true
       if (this.failedGovernmentCount + 1 === 3) {
         this.enactTopPolicy()
       } 
