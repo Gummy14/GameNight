@@ -30,11 +30,28 @@
 
     <div class="table">
       <div class="small-board">
-        <v-card-title class="title">Discard</v-card-title>
-        <v-card dark>
-          <draggable class="discard-stack" :list="discard" group="cards" @change="discardedPolicy">
-          </draggable>
-        </v-card>
+        <v-card-title class="title">Policy Deck</v-card-title>
+        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office!='President' || hand.length === 3">
+          <v-card
+            dark
+            class="deck"
+            v-for="(element) in deck"
+            :key="element.id"
+          >
+          </v-card>
+        </draggable>
+        <v-btn dark @click="restoreDeck">Restore</v-btn>
+        <v-divider></v-divider>
+        <v-btn v-if="needToPeekCards && user.office === 'President'" dark @click="peekCards">Examine</v-btn>
+          <transition-group name="fade" tag="ul" class="deck-stack">
+            <v-card
+              dark
+              :class="applyClass(element.type)"
+              v-for="(element) in peekDeck"
+              :key="element.id"
+            > 
+            </v-card>
+          </transition-group>
       </div>
 
       <div>
@@ -124,28 +141,11 @@
       </div>
       
       <div class="small-board">
-        <v-card-title class="title">Policy Deck</v-card-title>
-        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office!='President' || hand.length === 3">
-          <v-card
-            dark
-            class="deck"
-            v-for="(element) in deck"
-            :key="element.id"
-          >
-          </v-card>
-        </draggable>
-        <v-btn dark @click="restoreDeck">Restore</v-btn>
-        <v-divider></v-divider>
-        <v-btn v-if="needToPeekCards && user.office === 'President'" dark @click="peekCards">Examine</v-btn>
-          <transition-group name="fade" tag="ul" class="deck-stack">
-            <v-card
-              dark
-              :class="applyClass(element.type)"
-              v-for="(element) in peekDeck"
-              :key="element.id"
-            > 
-            </v-card>
-          </transition-group>
+        <v-card-title class="title">Discard</v-card-title>
+        <v-card dark>
+          <draggable class="discard-stack" :list="discard" group="cards" @change="discardedPolicy">
+          </draggable>
+        </v-card>
       </div>
 
       <v-dialog v-model="isGameOver" persistent max-width="290">
