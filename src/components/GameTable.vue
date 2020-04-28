@@ -96,7 +96,6 @@
         </v-slider>
 
         <v-btn dark class="start-button" @click="startGame">START GAME</v-btn>
-        <h3 v-if="chancellorNominee != null"> The President has nominated {{ chancellorNominee.username }} for Chancellor</h3>
         <v-card-title class="title">Player Board</v-card-title>
           <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
             <v-card class="card-hand">
@@ -139,23 +138,26 @@
         <v-divider></v-divider>
         <v-btn v-if="needToPeekCards && user.office === 'President'" dark @click="peekCards">Examine</v-btn>
           <transition-group name="fade" tag="ul" class="deck-stack">
-              <v-card
-                dark
-                :class="applyClass(element.type)"
-                v-for="(element) in peekDeck"
-                :key="element.id"
-              > 
-              </v-card>
-            </transition-group>
+            <v-card
+              dark
+              :class="applyClass(element.type)"
+              v-for="(element) in peekDeck"
+              :key="element.id"
+            > 
+            </v-card>
+          </transition-group>
       </div>
+
       <v-dialog v-model="isGameOver" persistent max-width="290">
         <game-over @newGame="startGame">
         </game-over>
       </v-dialog>
+
       <v-dialog v-model="isInvestigationOver" persistent max-width="290">
         <investigation-results :player="investigationResults" @investigationOver="setInvestigationResults(null, false)">
         </investigation-results>
       </v-dialog>
+
     </div>
   </div>
 </template>
@@ -215,10 +217,7 @@ export default {
       },
       isGameOver: false,
       isInvestigationOver: false,
-      investigationResults: null,
-      needToKillPlayer: false,
-      needToPeekCards: false,
-      needToInvestigatePlayer: false
+      investigationResults: null
     };
   },
   computed: {
@@ -233,7 +232,10 @@ export default {
       chancellor: 'chancellor',
       chancellorNominee: 'chancellorNominee',
       failedGovernmentCount: 'failedGovernmentCount',
-      graveyard: 'graveyard'
+      graveyard: 'graveyard',
+      needToKillPlayer: 'needToKillPlayer',
+      needToPeekCards: 'needToPeekCards',
+      needToInvestigatePlayer: 'needToInvestigatePlayer'
     })
   },
   mounted () {
@@ -304,7 +306,9 @@ export default {
         FailedGovernmentCount: doc.data().failedGovernmentCount
       })
       if (doc.data().graveyard.length > self.graveyard) {
-        self.needToKillPlayer = false
+        self.$store.commit('setNeedToKillPlayer', {
+          NeedToKillPlayer: false
+        })
         if (doc.data().graveyard[doc.data().graveyard.length-1].isHitler) {
           self.isGameOver = true
         }
@@ -334,9 +338,15 @@ export default {
     startGame () {
       var pick = Math.floor(Math.random() * (this.crowd.length))
       this.hand = []
-      this.needToKillPlayer = false
-      this.needToPeekCards = false
-      this.needToInvestigatePlayer = false
+      this.$store.commit('setNeedToKillPlayer', {
+        NeedToKillPlayer: false
+      })
+      this.$store.commit('setNeedToPeekCards', {
+        NeedToPeekCards: false
+      })
+      this.$store.commit('setNeedToInvestigatePlayer', {
+        NeedToInvestigatePlayer: false
+      })
       this.clearOffices()
       this.assignRoles()
       this.pickPresident(pick)
@@ -499,12 +509,16 @@ export default {
     newTurn (policyAdded) {
       if (policyAdded === 0 && (this.fascistBoard.length === 1) && (this.crowd.length >= 9)) {
         //investigate player
-        this.needToInvestigatePlayer = true
+        this.$store.commit('setNeedToInvestigatePlayer', {
+          NeedToInvestigatePlayer: true
+        })
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
 
       } else if (policyAdded === 0 && (this.fascistBoard.length === 2) && (this.crowd.length >= 7)) {
         //investigate player
-        this.needToInvestigatePlayer = true
+        this.$store.commit('setNeedToInvestigatePlayer', {
+          NeedToInvestigatePlayer: true
+        })
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
 
       } else if (policyAdded === 0 && (this.fascistBoard.length === 3) && (this.crowd.length >= 7)) {
@@ -512,12 +526,16 @@ export default {
 
       } else if (policyAdded === 0 && (this.fascistBoard.length === 3) && (this.crowd.length === 5 || this.crowd.length === 6)) {
         //president peaks at top 3 polices
-        this.needToPeekCards = true
+        this.$store.commit('setNeedToPeekCards', {
+          NeedToPeekCards: true
+        })
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
 
       } else if (policyAdded === 0 && (this.fascistBoard.length === 4 || this.fascistBoard.length === 5)) {
         //president kills someone
-        this.needToKillPlayer = true
+        this.$store.commit('setNeedToKillPlayer', {
+          NeedToKillPlayer: true
+        })
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
 
       } else {

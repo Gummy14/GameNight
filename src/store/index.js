@@ -15,7 +15,10 @@ export default new Vuex.Store({
     chancellorNominee: null,
     policies: [],
     failedGovernmentCount: 0,
-    graveyard: []
+    graveyard: [],
+    needToKillPlayer: false,
+    needToPeekCards: false,
+    needToInvestigatePlayer: false
   },
   mutations: {
     setUser (state, payload) {
@@ -51,6 +54,15 @@ export default new Vuex.Store({
     setGraveyard (state, payload) {
       state.graveyard = payload.Graveyard
     },
+    setNeedToKillPlayer (state, payload) {
+      state.needToKillPlayer = payload.NeedToKillPlayer
+    },
+    setNeedToPeekCards (state, payload) {
+      state.needToPeekCards = payload.NeedToPeekCards
+    },
+    setNeedToInvestigatePlayer (state, payload) {
+      state.needToInvestigatePlayer = payload.NeedToInvestigatePlayer
+    },
     clearStore (state) {
       state.user = undefined,
       state.crowd = [],
@@ -62,7 +74,10 @@ export default new Vuex.Store({
       state.chancellor = null,
       state.chancellorNominee = null,
       state.failedGovernmentCount = 0,
-      state.graveyard = []
+      state.graveyard = [],
+      state.needToKillPlayer = false,
+      state.needToPeekCards = false,
+      state.needToInvestigatePlayer = false
     }
   },
   actions: {
@@ -100,6 +115,15 @@ export default new Vuex.Store({
     },
     getGraveyard (state) {
       return state.graveyard
-    }
+    },
+    getNeedToKillPlayer (state) {
+      return state.needToKillPlayer
+    },
+    getNeedToPeekCards (state) {
+      return state.needToPeekCards
+    },
+    getNeedToInvestigatePlayer (state) {
+      return state.needToInvestigatePlayer
+    },
   }
 })

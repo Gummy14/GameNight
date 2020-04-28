@@ -22,8 +22,8 @@
         <v-card-actions>
             <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(true)">Vote Ja!</v-btn>
             <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
-            <v-btn outlined :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
-            <v-btn outlined :disabled="this.user.office != 'President'" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
+            <v-btn outlined v-if="needToKillPlayer" :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
+            <v-btn outlined v-if="needToInvestigatePlayer" :disabled="this.user.office != 'President'" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
         </v-card-actions>
     </div>
   </v-card>
@@ -47,7 +47,10 @@ export default {
       fascistBoard: 'fascistBoard', 
       liberalBoard: 'liberalBoard', 
       deck: 'deck',
-      graveyard: 'graveyard'
+      graveyard: 'graveyard',
+      needToKillPlayer: 'needToKillPlayer',
+      needToPeekCards: 'needToPeekCards',
+      needToInvestigatePlayer: 'needToInvestigatePlayer'
       }),
     isHitler() {
       if (this.user.isHitler === true) {
@@ -171,6 +174,9 @@ export default {
       return -1
     },
     killPlayer () {
+      this.$store.commit('setNeedToKillPlayer', {
+        NeedToKillPlayer: false
+      })
       var crowdIndex = this.getOffice('Sentenced')
       let player = this.crowd[crowdIndex]
       if (player.office === 'Sentenced') {
@@ -186,6 +192,9 @@ export default {
       }
     },
     investigatePlayer () {
+      this.$store.commit('setNeedToInvestigatePlayer', {
+        NeedToInvestigatePlayer: false
+      })
       var crowdIndex = this.getOffice('Under Investigation')
       this.$emit('investigationComplete', this.crowd[crowdIndex])
     }
