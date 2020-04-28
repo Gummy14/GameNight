@@ -97,30 +97,30 @@
 
         <v-btn dark class="start-button" @click="startGame">START GAME</v-btn>
         <v-card-title class="title">Player Board</v-card-title>
-          <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
-            <v-card class="card-hand">
-              <draggable class="hand" :list="hand" group="cards">
-                <v-card
-                  :class="applyClass(element.type)"
-                  v-for="(element) in hand"
-                  :key="element.id"
-                >
-                </v-card>
-              </draggable>
-              <v-btn 
-                v-if="user.office === 'President'" 
-                :outlined="hand.length != 2 || !hasDiscarded" 
-                color="#1e1e1e" 
-                :disabled="hand.length != 2 || !hasDiscarded" 
-                class="handoff" 
-                @click="addPolicy()"
+        <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
+          <v-card class="card-hand">
+            <draggable class="hand" :list="hand" group="cards">
+              <v-card
+                :class="applyClass(element.type)"
+                v-for="(element) in hand"
+                :key="element.id"
               >
-                Hand off cards
-              </v-btn>
-            </v-card>
-            <player-card @investigationComplete="setInvestigationResults($event, true)" class="player-card"> </player-card>
-          </div>
-          <player-card v-else class="player-hand player-card"> </player-card>
+              </v-card>
+            </draggable>
+            <v-btn 
+              v-if="user.office === 'President'" 
+              :outlined="hand.length != 2 || !hasDiscarded" 
+              color="#1e1e1e" 
+              :disabled="hand.length != 2 || !hasDiscarded" 
+              class="handoff" 
+              @click="addPolicy()"
+            >
+              Hand off cards
+            </v-btn>
+          </v-card>
+          <player-card @investigationComplete="setInvestigationResults($event, true)" class="player-card"> </player-card>
+        </div>
+        <player-card v-else class="player-hand player-card"> </player-card>
       </div>
       
       <div class="small-board">
@@ -570,6 +570,9 @@ export default {
     peekCards () {
       if (this.peekDeck.length > 0) {
         this.peekDeck = []
+        this.$store.commit('setNeedToPeekCards', {
+          NeedToPeekCards: false
+        })
         this.movePresidentToNextPlayer()
       } else {
         this.peekDeck.push(this.deck[this.deck.length-3], this.deck[this.deck.length-2], this.deck[this.deck.length-1])
@@ -579,6 +582,9 @@ export default {
       this.isInvestigationOver = status
       this.investigationResults = player
       if (!status) {
+        this.$store.commit('setNeedToInvestigatePlayer', {
+          NeedToInvestigatePlayer: false
+        })
         this.movePresidentToNextPlayer()
       }
     },
