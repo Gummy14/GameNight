@@ -4,7 +4,7 @@
       <v-list>
         <v-subheader class="space">PLAYERS</v-subheader>
         <v-divider></v-divider>
-        <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player.office)">
+        <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player)">
           <div v-if="user.office === 'President' && player.office != 'President'">
             <v-list-item  v-if="!needToKillPlayer && !needToInvestigatePlayer" @click="nominate(index, 'Chancellor Nominee')"> 
               {{ player.username }}
@@ -340,13 +340,34 @@ export default {
         'liberal': policyType === 1
       }
     },
-    applyOffice (office) {
-      return {
-        'president': office === 'President',
-        'chancellor': office === 'Chancellor',
-        'chancellor-nominee': office === 'Chancellor Nominee',
-        'sentenced': office === 'Sentenced',
-        'under-investigation': office === 'Under Investigation'
+    applyOffice (player) {
+      if (this.user.party === 'Fascist' && !this.user.isHitler) {
+        return {
+          'president': player.office === 'President',
+          'chancellor': player.office === 'Chancellor',
+          'chancellor-nominee': player.office === 'Chancellor Nominee',
+          'sentenced': player.office === 'Sentenced',
+          'under-investigation': player.office === 'Under Investigation',
+          'fascist-player': player.party === 'Fascist' && !player.isHitler,
+          'hitler' : player.isHitler
+        }
+      } else if (this.user.party === 'Fascist' && this.user.isHitler) {
+        return {
+          'president': player.office === 'President',
+          'chancellor': player.office === 'Chancellor',
+          'chancellor-nominee': player.office === 'Chancellor Nominee',
+          'sentenced': player.office === 'Sentenced',
+          'under-investigation': player.office === 'Under Investigation',
+          'hitler' : player.isHitler
+        }
+      } else {
+        return {
+          'president': player.office === 'President',
+          'chancellor': player.office === 'Chancellor',
+          'chancellor-nominee': player.office === 'Chancellor Nominee',
+          'sentenced': player.office === 'Sentenced',
+          'under-investigation': player.office === 'Under Investigation',
+        }
       }
     },
     startGame () {
@@ -361,13 +382,22 @@ export default {
       this.$store.commit('setNeedToInvestigatePlayer', {
         NeedToInvestigatePlayer: false
       })
+      this.setUpDoc.crowd = this.clearGraveyard()
       this.clearOffices()
       this.assignRoles()
       this.pickPresident(pick)
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
       this.isGameOver = false
-      this.setUpDoc.crowd = this.clearGraveyard()
+      
+      for (let i = 0; i < this.crowd.length; i++) {
+        if (this.crowd[i].userId === this.user.userId) {
+          this.$store.commit('setUser', {
+            User: this.crowd[i]
+          })
+          break;
+        }
+      }
       this.setUpGame()
     },
     addPolicy () {
@@ -491,11 +521,6 @@ export default {
       this.crowd.forEach((element, i) => {
         this.crowd[i].isHitler = roleSet[i].isHitler
         this.crowd[i].party = roleSet[i].party
-        if (this.crowd[i].userId === this.user.userId) {
-          this.$store.commit('setUser', {
-            User: this.crowd[i]
-          })
-        }
       })
     },
     createRoleSet(roleSet, numberOfLiberals, numberOfFascists) {
@@ -660,6 +685,12 @@ export default {
 }
 .under-investigation {
   background: #2aff4e;
+}
+.fascist-player {
+  background: #fc5f4a;
+}
+.hitler {
+  background: #a6120f;
 }
 .fascist-board {
   height: 125px;
