@@ -236,7 +236,17 @@ export default {
       needToKillPlayer: 'needToKillPlayer',
       needToPeekCards: 'needToPeekCards',
       needToInvestigatePlayer: 'needToInvestigatePlayer'
-    })
+    }),
+    hitlerPosition () {
+      var hitlerIndex = null
+      for (let x=0; x < this.crowd.length; x++) {
+        if (this.crowd[x].isHitler) {
+          hitlerIndex = this.crowd[x]
+          break
+        }
+      }
+      return hitlerIndex
+    },
   },
   mounted () {
     var self = this
@@ -275,8 +285,8 @@ export default {
       self.$store.commit('setChancellor', {
         Chancellor: doc.data().chancellor
       })
-      if (doc.data().chancellor.isHitler && self.fascistBoard.length >= 3) {
-        console.log(self.chancellor)
+      
+      if (self.hitlerPosition != null && self.hitlerPosition.office === 'Chancellor' && self.fascistBoard.length >= 3) {
         self.isGameOver = true
       }
 
@@ -726,7 +736,7 @@ export default {
 }
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 2s;
+  transition: opacity .75s;
 }
 .fade-enter,
 .fade-leave-to {
