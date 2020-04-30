@@ -749,6 +749,7 @@ export default {
 }
 .deck {
   width: 88px;
+  height: 132px;
   grid-column: 1;
   grid-row: 1;
 }
@@ -756,6 +757,11 @@ export default {
   width: 75px;
   height: 125px;
   display: grid;
+  margin-top: 350px;
+}
+.back {
+  background-image: url("../assets/policy-card-back.png");
+  background-size: 100%;
 }
 .back {
   background-image: url("../assets/policy-card-back.png");
@@ -768,6 +774,7 @@ export default {
 .discard-stack {
   width: 88px;
   height: 132px;
+  margin-top: 350px;
 }
 .title {
   padding-top: 0px;
@@ -802,7 +809,7 @@ export default {
 }
 .failed-government-tracker {
   position: relative;
-  top:-9.5%;
+  top:-8.25%;
   padding-left: 35.45%;
   padding-right: 36.25%;
   margin-bottom: -5%;
