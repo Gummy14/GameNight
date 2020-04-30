@@ -34,7 +34,7 @@
         <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office!='President' || hand.length === 3">
           <v-card
             dark
-            class="deck"
+            class="deck back"
             v-for="(element) in deck"
             :key="element.id"
           >
@@ -143,8 +143,10 @@
       <div class="small-board">
         <v-card-title class="title">Discard</v-card-title>
         <v-card dark>
-          <draggable class="discard-stack" :list="discard" group="cards" @change="discardedPolicy">
-          </draggable>
+            <draggable v-if="hasDiscarded === true" class="discard-stack back" :list="discard" group="cards" @change="discardedPolicy"> 
+            </draggable>
+            <draggable v-else class="discard-stack" :list="discard" group="cards" @change="discardedPolicy"> 
+            </draggable>
         </v-card>
       </div>
 
@@ -675,7 +677,7 @@ export default {
   background: rebeccapurple;
 }
 .chancellor {
-  background: orange 50%;
+  background: orange;
 }
 .sentenced {
   background: yellow;
@@ -725,8 +727,8 @@ export default {
   color: white;
 }
 .deck {
-  width: 75px;
-  height: 125px;
+  width: 88px;
+  height: 132px;
   grid-column: 1;
   grid-row: 1;
 }
@@ -734,14 +736,20 @@ export default {
   width: 75px;
   height: 125px;
   display: grid;
+  margin-top: 350px;
+}
+.back {
+  background-image: url("../assets/policy-card-back.png");
+  background-size: 100%;
 }
 .discard {
   width: 75px;
   height: 125px;
 }
 .discard-stack {
-  width: 75px;
-  height: 125px;
+  width: 88px;
+  height: 132px;
+  margin-top: 350px;
 }
 .title {
   padding-top: 0px;
@@ -775,7 +783,7 @@ export default {
 }
 .failed-government-tracker {
   position: relative;
-  top:-9.5%;
+  top:-8.25%;
   padding-left: 35.45%;
   padding-right: 36.25%;
   margin-bottom: -5%;
