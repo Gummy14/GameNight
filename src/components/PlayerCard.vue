@@ -24,6 +24,7 @@
             <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
             <v-btn outlined v-if="needToKillPlayer" :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
             <v-btn outlined v-if="needToInvestigatePlayer" :disabled="this.user.office != 'President'" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
+            <v-btn outlined v-if="needToPickNewPresident" :disabled="this.user.office != 'President'" @click="makePresident()">SELECT AS PRESIDENT</v-btn>
         </v-card-actions>
     </div>
   </v-card>
@@ -49,10 +50,13 @@ export default {
       liberalBoard: 'liberalBoard', 
       deck: 'deck',
       graveyard: 'graveyard',
+      nominee: 'nominee',
       needToKillPlayer: 'needToKillPlayer',
       needToPeekCards: 'needToPeekCards',
       needToInvestigatePlayer: 'needToInvestigatePlayer',
-      previousChancellor: 'previousChancellor'
+      needToPickNewPresident: 'needToPickNewPresident',
+      previousChancellor: 'previousChancellor',
+      president: 'president'
       }),
     isHitler() {
       if (this.user.isHitler === true) {
@@ -117,7 +121,7 @@ export default {
     },
     makeNomineeChancellor() {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousChancellor: this.crowd[this.chancellorNomineeCrowdIndex].userId})
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousChancellor: this.crowd[this.chancellorNomineeCrowdIndex].userId })
     },
     changePresident (player) {
       var lastPlayer = this.crowd.length - 1
@@ -149,7 +153,7 @@ export default {
         liberalBoard: this.liberalBoard,
         fascistBoard: this.fascistBoard,
         president: this.crowd[pres], 
-        chancellorNominee: null,
+        nominee: null,
         chancellor: null,
         failedGovernmentCount: totalFailedGovernments,
         graveyard: this.graveyard
@@ -209,6 +213,27 @@ export default {
       })
       var crowdIndex = this.getOffice('Under Investigation')
       this.$emit('investigationComplete', this.crowd[crowdIndex])
+    },
+    makePresident () {
+      for (let c = 0; c < this.crowd.length; c ++) {
+        if (this.crowd[c].office === 'President') {
+          var nextPresidentPosition
+          if (c != this.crowd.length - 1) {
+            nextPresidentPosition = c + 1
+          } else {
+            nextPresidentPosition = 0
+          }
+          this.$store.commit('setNextPresidentPosition', {
+            NextPresidentPosition: nextPresidentPosition
+          })
+          this.crowd[c].office = 'None'
+        } else if (this.crowd[c].userId === this.nominee.userId) {
+          this.crowd[c].office = 'President'
+        } else {
+          this.crowd[c].office = 'None'
+        }
+      }
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: null, president: this.nominee })
     }
   }
 }

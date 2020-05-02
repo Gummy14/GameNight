@@ -12,14 +12,16 @@ export default new Vuex.Store({
     deck: [],
     president: null,
     chancellor: null,
-    chancellorNominee: null,
+    nominee: null,
     policies: [],
     failedGovernmentCount: 0,
     graveyard: [],
     needToKillPlayer: false,
     needToPeekCards: false,
     needToInvestigatePlayer: false,
-    previousChancellor: ''
+    needToPickNewPresident: false,
+    previousChancellor: '',
+    nextPresidentPosition: -1
   },
   mutations: {
     setUser (state, payload) {
@@ -46,8 +48,8 @@ export default new Vuex.Store({
     setChancellor (state, payload) {
       state.chancellor = payload.Chancellor
     },
-    setChancellorNominee (state, payload) {
-      state.chancellorNominee = payload.ChancellorNominee
+    setNominee (state, payload) {
+      state.nominee = payload.Nominee
     },
     setFailedGovernmentCount (state, payload) {
       state.failedGovernmentCount = payload.FailedGovernmentCount
@@ -64,8 +66,21 @@ export default new Vuex.Store({
     setNeedToInvestigatePlayer (state, payload) {
       state.needToInvestigatePlayer = payload.NeedToInvestigatePlayer
     },
+    setNeedToPickNewPresident (state, payload) {
+      state.needToPickNewPresident = payload.NeedToPickNewPresident
+    },
     setPreviousChancellor (state, payload) {
       state.previousChancellor = payload.PreviousChancellor
+    },
+    setNextPresidentPosition (state, payload) {
+      state.nextPresidentPosition = payload.NextPresidentPosition
+    },
+    resetPresidentialPowers (state) {
+      state.needToKillPlayer = false,
+      state.needToPeekCards = false,
+      state.needToInvestigatePlayer = false,
+      state.needToPickNewPresident = false,
+      state.nextPresidentPosition = -1
     },
     clearStore (state) {
       state.user = undefined,
@@ -76,13 +91,15 @@ export default new Vuex.Store({
       state.policies = [],
       state.president = null,
       state.chancellor = null,
-      state.chancellorNominee = null,
+      state.nominee = null,
       state.failedGovernmentCount = 0,
       state.graveyard = [],
       state.needToKillPlayer = false,
       state.needToPeekCards = false,
       state.needToInvestigatePlayer = false,
-      state.previousChancellor = ''
+      state.needToPickNewPresident = false,
+      state.previousChancellor = '',
+      state.nextPresidentPosition = -1
     }
   },
   actions: {
@@ -112,8 +129,8 @@ export default new Vuex.Store({
     getChancellor (state) {
       return state.chancellor
     },
-    getChancellorNominee (state) {
-      return state.chancellorNominee
+    getNominee (state) {
+      return state.nominee
     },
     getFailedGovernmentCount (state) {
       return state.failedGovernmentCount
@@ -130,8 +147,14 @@ export default new Vuex.Store({
     getNeedToInvestigatePlayer (state) {
       return state.needToInvestigatePlayer
     },
+    getNeedToPickNewPresident (state) {
+      return state.needToPickNewPresident
+    },
     getPreviousChancellor (state) {
       return state.previousChancellor
     },
+    getNextPresidentPosition (state) {
+      return state.nextPresidentPosition
+    }
   }
 })
