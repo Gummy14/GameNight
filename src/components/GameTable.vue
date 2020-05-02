@@ -461,11 +461,7 @@ export default {
         element.vote = null
       })
       this.crowd[nominee].office = nomination
-      //if (nomination === 'Chancellor Nominee') {
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: this.crowd[nominee] })
-      //} else {
-        //firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
-      //}
     },
     clearNominees () {
       for (let x=0; x < this.crowd.length; x++) {
