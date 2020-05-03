@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="overlord">
     <v-card dark class="login">
       <v-list>
         <v-subheader class="space">PLAYERS</v-subheader>
@@ -9,32 +9,26 @@
             <div v-if="!needToKillPlayer && !needToInvestigatePlayer && !needToPickNewPresident">
               <v-list-item  v-if="player.userId != previousChancellor" @click="nominate(index, 'Chancellor Nominee')"> 
                 {{ player.username }}
-                <v-spacer></v-spacer>
               </v-list-item>
               <v-list-item  v-else-if="player.userId === previousChancellor"> 
                 {{ player.username }}
-                <v-spacer></v-spacer>
               </v-list-item>
             </div>
             <v-list-item v-else-if="needToKillPlayer" @click="nominate(index, 'Sentenced')"> 
               {{ player.username }}
-              <v-spacer></v-spacer>
             </v-list-item>
             <v-list-item v-else-if="needToInvestigatePlayer" @click="nominate(index, 'Under Investigation')"> 
               {{ player.username }}
-              <v-spacer></v-spacer>
             </v-list-item>
             <v-list-item v-else-if="needToPickNewPresident" @click="nominate(index, 'New President')"> 
               {{ player.username }}
-              <v-spacer></v-spacer>
             </v-list-item>
           </div>
           <v-list-item v-else> 
             {{ player.username }}
-            <v-spacer></v-spacer>
           </v-list-item>
           <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
-          </div>
+        </div> 
       </v-list>
     </v-card>
 
@@ -67,7 +61,7 @@
       <div>
         <div class="board">
           <v-card dark class="board">
-            <v-img src="../assets/fascist-board.png" height="auto" width="100%">
+            <v-img src="../assets/fascist-board.png" width="100%">
               <draggable 
                 class="fascist-board" 
                 :list="fascistBoard" 
@@ -89,7 +83,7 @@
 
         <div class="board">
           <v-card dark class="board"> 
-            <v-img src="../assets/liberal-board.png" height="auto" width="100%" class="img">
+            <v-img src="../assets/liberal-board.png" width="100%">
               <draggable 
                 class="liberal-board" 
                 :list="liberalBoard" 
@@ -214,7 +208,7 @@ export default {
       peekDeck: [],
       hand: [],
       discard: [],
-      // hasDiscarded: false,
+      hasDiscarded: false,
       
       setUpDoc: {
         crowd: [],
@@ -227,7 +221,6 @@ export default {
         policies: [],
         graveyard: [],
         failedGovernmentCount: 0,
-        hasDiscarded: false,
         previousChancellor: ''
       },
       isGameOver: false,
@@ -403,6 +396,7 @@ export default {
     startGame () {
       var pick = Math.floor(Math.random() * (this.crowd.length))
       this.hand = []
+      this.hasDiscarded = false
       this.$store.commit('resetPresidentialPowers')
       this.setUpDoc.crowd = this.clearGraveyard()
       this.clearOffices()
@@ -671,18 +665,16 @@ export default {
 }
 </script>
 <style scoped>
+.overlord {
+  display: flex;
+}
 .login {
   margin: 20px;
-  max-width: 250px;
+  height: 500px;
 }
-
 .table {
   display: flex;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
+  max-height: 100%;
 }
 .policy {
   width: 88px;
