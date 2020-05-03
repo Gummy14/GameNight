@@ -215,9 +215,9 @@ export default {
       this.$emit('investigationComplete', this.crowd[crowdIndex])
     },
     makePresident () {
-      for (let c = 0; c < this.crowd.length; c ++) {
+      var nextPresidentPosition
+      for (let c = 0; c < this.crowd.length; c++) {
         if (this.crowd[c].office === 'President') {
-          var nextPresidentPosition
           if (c != this.crowd.length - 1) {
             nextPresidentPosition = c + 1
           } else {
@@ -233,7 +233,7 @@ export default {
           this.crowd[c].office = 'None'
         }
       }
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: null, president: this.nominee })
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: null, president: this.nominee, nextPresidentPosition: nextPresidentPosition})
     }
   }
 }
