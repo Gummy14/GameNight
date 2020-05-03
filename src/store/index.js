@@ -19,7 +19,7 @@ export default new Vuex.Store({
     needToKillPlayer: false,
     needToPeekCards: false,
     needToInvestigatePlayer: false,
-    previousChancellor: null
+    previousChancellor: ''
   },
   mutations: {
     setUser (state, payload) {
@@ -82,7 +82,7 @@ export default new Vuex.Store({
       state.needToKillPlayer = false,
       state.needToPeekCards = false,
       state.needToInvestigatePlayer = false,
-      state.previousChancellor = null
+      state.previousChancellor = ''
     }
   },
   actions: {

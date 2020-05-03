@@ -5,11 +5,17 @@
         <v-subheader class="space">PLAYERS</v-subheader>
         <v-divider></v-divider>
         <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player)">
-          <div v-if="user.office === 'President' && player.office != 'President' && previousChancellor.userId != player.userId">
-            <v-list-item  v-if="!needToKillPlayer && !needToInvestigatePlayer" @click="nominate(index, 'Chancellor Nominee')"> 
-              {{ player.username }}
-              <v-spacer></v-spacer>
-            </v-list-item>
+          <div v-if="user.office === 'President' && player.office != 'President'">
+            <div v-if="!needToKillPlayer && !needToInvestigatePlayer">
+              <v-list-item  v-if="player.userId != previousChancellor" @click="nominate(index, 'Chancellor Nominee')"> 
+                {{ player.username }}
+                <v-spacer></v-spacer>
+              </v-list-item>
+              <v-list-item  v-else-if="player.userId === previousChancellor"> 
+                {{ player.username }}
+                <v-spacer></v-spacer>
+              </v-list-item>
+            </div>
             <v-list-item v-else-if="needToKillPlayer" @click="nominate(index, 'Sentenced')"> 
               {{ player.username }}
               <v-spacer></v-spacer>
@@ -213,7 +219,8 @@ export default {
         chancellorNominee: null,
         policies: [],
         graveyard: [],
-        failedGovernmentCount: 0
+        failedGovernmentCount: 0,
+        previousChancellor: ''
       },
       isGameOver: false,
       isInvestigationOver: false,
@@ -277,7 +284,7 @@ export default {
         Chancellor: doc.data().chancellor
       })
       
-      if (doc.data().chancellor.isHitler) {
+      if (doc.data().chancellor != null && doc.data().chancellor.isHitler) {
         self.isGameOver = true
       }
 
