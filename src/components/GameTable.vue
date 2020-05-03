@@ -648,7 +648,6 @@ export default {
       }
     },
     movePresidentToNextPlayer () {
-      console.log('HERE')
       if (this.nextPresidentPosition != -1) {
         this.clearOffices()
         var nextPresident = this.crowd[this.nextPresidentPosition]

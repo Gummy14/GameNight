@@ -235,7 +235,6 @@ export default {
           this.crowd[c].office = 'None'
         }
       }
-      console.log('makePresident')
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: null, president: president, nextPresidentPosition: nextPresidentPosition})
     }
   }
