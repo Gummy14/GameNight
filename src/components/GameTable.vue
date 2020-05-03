@@ -41,8 +41,7 @@
     <div class="table">
       <div class="small-board">
         <v-card-title class="title">Policy Deck</v-card-title>
-        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck">
-           <!-- :disabled="user.office!='President' || hand.length === 3"> -->
+        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office!='President' || hand.length === 3">
           <v-card
             dark
             class="deck"
@@ -73,9 +72,9 @@
                 class="fascist-board" 
                 :list="fascistBoard" 
                 group="cards" 
-                @change="newTurn(0)" 
+                @change="newTurn(0)"
+                :disabled="user.office != 'Chancellor' || hand.length != 1"
               >
-                <!-- :disabled="user.office != 'Chancellor' || hand.length != 1" -->
 
                 <v-card
                   :class="applyClass(element.type)"
@@ -570,7 +569,7 @@ export default {
         })
         firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
 
-      } else if (policyAdded === 0 && (this.fascistBoard.length === 1) && (this.crowd.length >= 1)) {
+      } else if (policyAdded === 0 && (this.fascistBoard.length === 3) && (this.crowd.length >= 7)) {
         //president picks new president
         this.$store.commit('setNeedToPickNewPresident', {
           NeedToPickNewPresident: true
