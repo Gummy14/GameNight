@@ -216,6 +216,7 @@ export default {
     },
     makePresident () {
       var nextPresidentPosition
+      var president
       for (let c = 0; c < this.crowd.length; c++) {
         if (this.crowd[c].office === 'President') {
           if (c != this.crowd.length - 1) {
@@ -229,11 +230,13 @@ export default {
           this.crowd[c].office = 'None'
         } else if (this.crowd[c].userId === this.nominee.userId) {
           this.crowd[c].office = 'President'
+          president = this.crowd[c]
         } else {
           this.crowd[c].office = 'None'
         }
       }
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: null, president: this.nominee, nextPresidentPosition: nextPresidentPosition})
+      console.log('makePresident')
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: null, president: president, nextPresidentPosition: nextPresidentPosition})
     }
   }
 }

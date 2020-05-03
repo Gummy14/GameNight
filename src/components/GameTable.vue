@@ -351,7 +351,7 @@ export default {
         PreviousChancellor: doc.data().previousChancellor
       })
 
-      this.$store.commit('setNextPresidentPosition', {
+      self.$store.commit('setNextPresidentPosition', {
         NextPresidentPosition: doc.data().nextPresidentPosition
       })
 
@@ -648,17 +648,18 @@ export default {
       }
     },
     movePresidentToNextPlayer () {
-      console.log('this.nextPresidentPosition', this.nextPresidentPosition)
+      console.log('HERE')
       if (this.nextPresidentPosition != -1) {
-        this.crowd[this.nextPresidentPosition].office = 'President'
-        this.clearNominees()
+        this.clearOffices()
+        var nextPresident = this.crowd[this.nextPresidentPosition]
+        nextPresident.office = 'President'
         this.$store.commit('setNextPresidentPosition', {
           NextPresidentPosition: -1
         })
         this.$store.commit('setNeedToPickNewPresident', {
           NeedToPickNewPresident: false
         })
-        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: this.crowd[this.nextPresidentPosition], nominee: null, chancellor: null, fascistBoard: this.fascistBoard, liberalBoard: this.liberalBoard })
+        firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, president: nextPresident, nominee: null, chancellor: null, fascistBoard: this.fascistBoard, liberalBoard: this.liberalBoard })
       } else {
         var newPresident = this.newPresident(this.getPresident())
         this.clearNominees()
