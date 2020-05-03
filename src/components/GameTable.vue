@@ -214,7 +214,7 @@ export default {
       peekDeck: [],
       hand: [],
       discard: [],
-      hasDiscarded: false,
+      // hasDiscarded: false,
       
       setUpDoc: {
         crowd: [],
@@ -227,6 +227,7 @@ export default {
         policies: [],
         graveyard: [],
         failedGovernmentCount: 0,
+        hasDiscarded: false,
         previousChancellor: ''
       },
       isGameOver: false,
