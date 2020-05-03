@@ -5,7 +5,7 @@
         <v-subheader class="space">PLAYERS</v-subheader>
         <v-divider></v-divider>
         <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player)">
-          <div v-if="user.office === 'President' && player.office != 'President'">
+          <div v-if="user.office === 'President' && player.office != 'President' && previousChancellor.userId != player.userId">
             <v-list-item  v-if="!needToKillPlayer && !needToInvestigatePlayer" @click="nominate(index, 'Chancellor Nominee')"> 
               {{ player.username }}
               <v-spacer></v-spacer>
@@ -235,18 +235,9 @@ export default {
       graveyard: 'graveyard',
       needToKillPlayer: 'needToKillPlayer',
       needToPeekCards: 'needToPeekCards',
-      needToInvestigatePlayer: 'needToInvestigatePlayer'
-    }),
-    hitlerPosition () {
-      var hitlerIndex = null
-      for (let x=0; x < this.crowd.length; x++) {
-        if (this.crowd[x].isHitler) {
-          hitlerIndex = this.crowd[x]
-          break
-        }
-      }
-      return hitlerIndex
-    },
+      needToInvestigatePlayer: 'needToInvestigatePlayer',
+      previousChancellor: 'previousChancellor'
+    })
   },
   mounted () {
     var self = this
@@ -286,7 +277,7 @@ export default {
         Chancellor: doc.data().chancellor
       })
       
-      if (self.hitlerPosition != null && self.hitlerPosition.office === 'Chancellor' && self.fascistBoard.length >= 3) {
+      if (doc.data().chancellor.isHitler) {
         self.isGameOver = true
       }
 
@@ -330,6 +321,11 @@ export default {
       self.$store.commit('setGraveyard', {
         Graveyard: doc.data().graveyard
       })
+
+      self.$store.commit('setPreviousChancellor', {
+        PreviousChancellor: doc.data().previousChancellor
+      })
+
     })
   },
   methods: {

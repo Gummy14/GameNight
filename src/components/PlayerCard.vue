@@ -51,7 +51,8 @@ export default {
       graveyard: 'graveyard',
       needToKillPlayer: 'needToKillPlayer',
       needToPeekCards: 'needToPeekCards',
-      needToInvestigatePlayer: 'needToInvestigatePlayer'
+      needToInvestigatePlayer: 'needToInvestigatePlayer',
+      previousChancellor: 'previousChancellor'
       }),
     isHitler() {
       if (this.user.isHitler === true) {
@@ -116,7 +117,8 @@ export default {
     },
     makeNomineeChancellor() {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0 })
+      this.previousChancellor = this.crowd[this.chancellorNomineeCrowdIndex]
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, chancellorNominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousChancellor: this.previousChancellor})
     },
     changePresident (player) {
       var lastPlayer = this.crowd.length - 1
