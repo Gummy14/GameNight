@@ -165,6 +165,10 @@
         </investigation-results>
       </v-dialog>
 
+      <v-dialog v-model="callingForVeto" persistent max-width="450">
+        <veto></veto>
+      </v-dialog>
+
     </div>
   </div>
 </template>
@@ -176,13 +180,15 @@ import { mapState } from 'vuex'
 import PlayerCard from './PlayerCard'
 import GameOver from './GameOver'
 import InvestigationResults from './InvestigationResults'
+import Veto from './Veto'
 export default {
   name: 'game-table',
   components: {
     draggable,
     PlayerCard,
     GameOver,
-    InvestigationResults
+    InvestigationResults,
+    Veto
   },
   data() {
     return {
@@ -221,7 +227,10 @@ export default {
         policies: [],
         graveyard: [],
         failedGovernmentCount: 0,
-        previousChancellor: ''
+        previousChancellor: '',
+        nextPresidentPosition: -1,
+        vetoUnlocked: false,
+        callingForVeto: false
       },
       isGameOver: false,
       isInvestigationOver: false,
@@ -246,29 +255,28 @@ export default {
       needToInvestigatePlayer: 'needToInvestigatePlayer',
       needToPickNewPresident: 'needToPickNewPresident',
       nextPresidentPosition: 'nextPresidentPosition',
-      previousChancellor: 'previousChancellor'
+      previousChancellor: 'previousChancellor',
+      callingForVeto: 'callingForVeto'
     })
   },
   mounted () {
     var self = this
     firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
-      if (doc.data().policies.length === 2) {
-        self.handOff()
-      }
 
-      if (doc.data().president?.userId === self.user.userId) {
+      if (doc.data().president?.userId === self.user.userId && self.user.office != 'President') {
         self.$store.commit('setUser', {
           User: doc.data().president
         })
-      } else if (doc.data().chancellor?.userId === self.user.userId) {
+      } else if (doc.data().chancellor?.userId === self.user.userId && self.user.office != 'Chancellor') {
         self.$store.commit('setUser', {
           User: doc.data().chancellor
         })
-      } else if (doc.data().nominee?.userId === self.user.userId) {
+      } else if (doc.data().nominee?.userId === self.user.userId && self.user.office != 'Nominee') {
         self.$store.commit('setUser', {
           User: doc.data().nominee
         })
       } else {
+        self.hand = []
         self.user.office = 'None'
         self.$store.commit('setUser', {
           User: self.user
@@ -325,6 +333,9 @@ export default {
       self.$store.commit('setPolicies', {
         Policies: doc.data().policies
       })
+      if (doc.data().policies.length === 2) {
+        self.handOff()
+      }
 
       self.$store.commit('setFailedGovernmentCount', {
         FailedGovernmentCount: doc.data().failedGovernmentCount
@@ -348,6 +359,14 @@ export default {
 
       self.$store.commit('setNextPresidentPosition', {
         NextPresidentPosition: doc.data().nextPresidentPosition
+      })
+
+      self.$store.commit('setVetoUnlocked', {
+        VetoUnlocked: doc.data().vetoUnlocked
+      })
+
+      self.$store.commit('setCallingForVeto', {
+        CallingForVeto: doc.data().callingForVeto
       })
 
     })
@@ -408,8 +427,9 @@ export default {
       this.setUpGame()
     },
     addPolicy () {
-      firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
+      var policiesToHandOff = this.hand
       this.hand = []
+      firebase.firestore().collection('root').doc('game-room').update({ policies: policiesToHandOff })
     },
     removePolicyFromDeck () {
       firebase.firestore().collection('root').doc('game-room').update({ deck: this.deck })
@@ -441,6 +461,7 @@ export default {
       }
     },
     handOff() {
+      console.log('HERE', this.user.office === 'Chancellor', this.policies)
       if (this.user.office === 'Chancellor') {
         this.hand = this.policies
       }
@@ -585,7 +606,7 @@ export default {
         this.$store.commit('setNeedToKillPlayer', {
           NeedToKillPlayer: true
         })
-        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard, vetoUnlocked: this.fascistBoard.length === 5 })
 
       } else {
         //president takes no action
