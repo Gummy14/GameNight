@@ -165,7 +165,7 @@
         </investigation-results>
       </v-dialog>
 
-      <v-dialog v-model="callingForVeto" persistent max-width="450">
+      <v-dialog v-if="user.office === 'President'" v-model="callingForVeto" persistent max-width="450">
         <veto></veto>
       </v-dialog>
 
@@ -275,9 +275,7 @@ export default {
           User: doc.data().nominee
         })
       } else {
-        console.log('hand1', self.hand)
         self.hand = []
-        console.log('hand2', self.hand)
         self.user.office = 'None'
         self.$store.commit('setUser', {
           User: self.user
@@ -305,7 +303,7 @@ export default {
         Chancellor: doc.data().chancellor
       })
       
-      if (doc.data().chancellor != null && doc.data().chancellor.isHitler) {
+      if (doc.data().chancellor != null && doc.data().chancellor.isHitler && self.fascistBoard.length >= 3) {
         self.isGameOver = true
       }
 
