@@ -165,7 +165,7 @@
         </investigation-results>
       </v-dialog>
 
-      <v-dialog v-model="callingForVeto" persistent max-width="450">
+      <v-dialog v-if="user.office === 'President'" v-model="callingForVeto" persistent max-width="450">
         <veto></veto>
       </v-dialog>
 
@@ -305,7 +305,7 @@ export default {
         Chancellor: doc.data().chancellor
       })
       
-      if (doc.data().chancellor != null && doc.data().chancellor.isHitler) {
+      if (doc.data().chancellor != null && doc.data().chancellor.isHitler && self.fascistBoard.length >= 3) {
         self.isGameOver = true
       }
 

@@ -1,16 +1,25 @@
 <template>
   <v-card dark>
-    <v-card-title>Veto!</v-card-title>
-    <v-card-subtitle>Your Chancellor has called for a veto</v-card-subtitle>
-    <v-card-text>Agreeing will allow your chancellor to discard all polices, but increment the failed government counter by 1</v-card-text> 
-    <br>
-    <v-card-text>Disagreeing will force your chancellor to enact a policy from their hand</v-card-text> 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn @click="agree()">Agree</v-btn>
-      <v-btn @click="disagree()">Disagree</v-btn>  
-    </v-card-actions>
+    <div v-if="user.office === 'President'"> 
+      <v-card-title>Veto!</v-card-title>
+      <v-card-subtitle>Your Chancellor has called for a veto</v-card-subtitle>
+      <v-card-text>Agreeing will allow your chancellor to discard all polices, but increment the failed government counter by 1</v-card-text> 
+      <br>
+      <v-card-text>Disagreeing will force your chancellor to enact a policy from their hand</v-card-text> 
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="agree()">Agree</v-btn>
+        <v-btn @click="disagree()">Disagree</v-btn>  
+      </v-card-actions>
+    </div>
+    <div v-else-if="user.office === 'Chancellor'">
+      <v-card-title>Veto!</v-card-title>
+      <v-card-subtitle>You have called for a veto</v-card-subtitle>
+      <br>
+      <v-card-text>Currently awaiting your President's response</v-card-text>
+    </div>
   </v-card>
+
 </template>
 
 <script>
