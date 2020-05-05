@@ -275,9 +275,7 @@ export default {
           User: doc.data().nominee
         })
       } else {
-        console.log('hand1', self.hand)
         self.hand = []
-        console.log('hand2', self.hand)
         self.user.office = 'None'
         self.$store.commit('setUser', {
           User: self.user
