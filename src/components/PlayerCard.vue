@@ -24,7 +24,7 @@
           <v-btn outlined v-if="needToKillPlayer" :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
           <v-btn outlined v-if="needToInvestigatePlayer" :disabled="this.user.office != 'President'" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
           <v-btn outlined v-if="needToPickNewPresident" :disabled="this.user.office != 'President'" @click="makePresident()">SELECT AS PRESIDENT</v-btn>
-          <v-btn outlined v-if="vetoUnlocked && this.user.office != 'Chancellor'" @click="veto()">CALL FOR VETO</v-btn>
+          <v-btn outlined v-if="vetoUnlocked && this.user.office === 'Chancellor'" @click="veto()">CALL FOR VETO</v-btn>
         </v-card-actions>
     </div>
   </v-card>
