@@ -1,16 +1,23 @@
 <template>
   <v-card dark>
-    <div v-if="user.office === 'President'"> 
-      <v-card-title>Veto!</v-card-title>
-      <v-card-subtitle>Your Chancellor has called for a veto</v-card-subtitle>
-      <v-card-text>Agreeing will allow your chancellor to discard all polices, but increment the failed government counter by 1</v-card-text> 
-      <br>
-      <v-card-text>Disagreeing will force your chancellor to enact a policy from their hand</v-card-text> 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn @click="presidentVote(true)">Agree</v-btn>
-        <v-btn @click="presidentVote(false)">Disagree</v-btn>
-      </v-card-actions>
+    <div v-if="user.office === 'President'">
+      <div v-if="presidentialVetoVote===null">
+        <v-card-title>Veto!</v-card-title>
+        <v-card-subtitle>Your Chancellor has called for a veto</v-card-subtitle>
+        <v-card-text>Agreeing will allow your chancellor to discard all polices, but increment the failed government counter by 1</v-card-text> 
+        <br>
+        <v-card-text>Disagreeing will force your chancellor to enact a policy from their hand</v-card-text> 
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="presidentVote(true)">Agree</v-btn>
+          <v-btn @click="presidentVote(false)">Disagree</v-btn>
+        </v-card-actions>
+      </div>
+      <div v-if="presidentialVetoVote===null">
+        <v-card-text v-if="presidentialVetoVote===true">You have chosen to veto this hand</v-card-text>
+        <v-card-text v-if="presidentialVetoVote===false">You have chosen NOT to veto this hand</v-card-text>
+        <v-card-text v-if="presidentialVetoVote===null">Currently awaiting your Chancellor's confirmation</v-card-text>
+      </div>
     </div>
     <div v-else-if="user.office === 'Chancellor'">
       <v-card-title>Veto!</v-card-title>
@@ -72,7 +79,7 @@ export default {
       this.failedGovernment()
     },
     disagree () {
-      firebase.firestore().collection('root').doc('game-room').update({ callingForVeto: false })  
+      firebase.firestore().collection('root').doc('game-room').update({ callingForVeto: false, presidentialVetoVote: null })  
     },
     presidentVote (vote) {
       firebase.firestore().collection('root').doc('game-room').update({ presidentialVetoVote: vote }) 
@@ -122,7 +129,8 @@ export default {
         nominee: null,
         chancellor: null,
         failedGovernmentCount: this.failedGovernmentCount + 1 === 3 ? 0 : this.failedGovernmentCount + 1,
-        callingForVeto: false
+        callingForVeto: false,
+        presidentialVetoVote: null
       })
     },
     enactTopPolicy () {
