@@ -165,7 +165,7 @@
         </investigation-results>
       </v-dialog>
 
-      <v-dialog v-if="user.office === 'President'" v-model="callingForVeto" persistent max-width="450">
+      <v-dialog v-model="callingForVeto" persistent max-width="450">
         <veto></veto>
       </v-dialog>
 
@@ -230,7 +230,8 @@ export default {
         previousChancellor: '',
         nextPresidentPosition: -1,
         vetoUnlocked: false,
-        callingForVeto: false
+        callingForVeto: false,
+        presidentialVetoVote: null
       },
       isGameOver: false,
       isInvestigationOver: false,
@@ -366,6 +367,10 @@ export default {
 
       self.$store.commit('setCallingForVeto', {
         CallingForVeto: doc.data().callingForVeto
+      })
+
+      self.$store.commit('presidentialVetoVote', {
+        PresidentialVetoVote: doc.data().presidentialVetoVote
       })
 
     })

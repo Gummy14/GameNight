@@ -8,15 +8,17 @@
       <v-card-text>Disagreeing will force your chancellor to enact a policy from their hand</v-card-text> 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn @click="agree()">Agree</v-btn>
-        <v-btn @click="disagree()">Disagree</v-btn>  
+        <v-btn @click="presidentVote(true)">Agree</v-btn>
+        <v-btn @click="presidentVote(false)">Disagree</v-btn>
       </v-card-actions>
     </div>
     <div v-else-if="user.office === 'Chancellor'">
       <v-card-title>Veto!</v-card-title>
       <v-card-subtitle>You have called for a veto</v-card-subtitle>
       <br>
-      <v-card-text>Currently awaiting your President's response</v-card-text>
+      <v-card-text v-if="presidentialVetoVote===null">Currently awaiting your President's response</v-card-text>
+      <v-card-text v-if="presidentialVetoVote===true">The President has agreed to veto this hand</v-card-text>
+      <v-card-text v-if="presidentialVetoVote===false">The President has decided NOT to veto this hand. Pick your poison.</v-card-text>
     </div>
   </v-card>
 
@@ -42,6 +44,8 @@ export default {
       nominee: 'nominee',
       previousChancellor: 'previousChancellor',
       president: 'president',
+      user: 'user',
+      presidentialVetoVote: 'presidentialVetoVote'
     }),
     chancellorNominee () {
       var doesChancellorNomineeExist = false
@@ -66,6 +70,9 @@ export default {
     },
     disagree () {
       firebase.firestore().collection('root').doc('game-room').update({ callingForVeto: false })  
+    },
+    presidentVote (vote) {
+      firebase.firestore().collection('root').doc('game-room').update({ presidentialVetoVote: vote }) 
     },
     failedGovernment () {
       if (this.failedGovernmentCount + 1 === 3) {

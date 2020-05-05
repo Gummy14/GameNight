@@ -23,7 +23,8 @@ export default new Vuex.Store({
     previousChancellor: '',
     nextPresidentPosition: -1,
     vetoUnlocked: false,
-    callingForVeto: false
+    callingForVeto: false,
+    presidentialVetoVote: null
   },
   mutations: {
     setUser (state, payload) {
@@ -90,6 +91,9 @@ export default new Vuex.Store({
       state.needToPickNewPresident = false,
       state.nextPresidentPosition = -1
     },
+    setpresidentialVetoVote (state, payload) {
+      state.presidentialVetoVote = payload.PresidentialVetoVote
+    },
     clearStore (state) {
       state.user = undefined,
       state.crowd = [],
@@ -109,7 +113,8 @@ export default new Vuex.Store({
       state.previousChancellor = '',
       state.nextPresidentPosition = -1,
       state.vetoUnlocked = false,
-      state.callingForVeto = false
+      state.callingForVeto = false,
+      state.presidentialVetoVote = null
     }
   },
   actions: {
@@ -171,6 +176,9 @@ export default new Vuex.Store({
     },
     getCallingForVeto (state) {
       return state.callingForVeto
+    },
+    getpresidentialVetoVote (state) {
+      return state.presidentialVetoVote
     }
   }
 })
