@@ -91,7 +91,7 @@ export default new Vuex.Store({
       state.needToPickNewPresident = false,
       state.nextPresidentPosition = -1
     },
-    setpresidentialVetoVote (state, payload) {
+    setPresidentialVetoVote (state, payload) {
       state.presidentialVetoVote = payload.PresidentialVetoVote
     },
     clearStore (state) {

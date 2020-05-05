@@ -369,7 +369,7 @@ export default {
         CallingForVeto: doc.data().callingForVeto
       })
 
-      self.$store.commit('presidentialVetoVote', {
+      self.$store.commit('setPresidentialVetoVote', {
         PresidentialVetoVote: doc.data().presidentialVetoVote
       })
 

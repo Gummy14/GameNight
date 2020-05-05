@@ -19,6 +19,9 @@
       <v-card-text v-if="presidentialVetoVote===null">Currently awaiting your President's response</v-card-text>
       <v-card-text v-if="presidentialVetoVote===true">The President has agreed to veto this hand</v-card-text>
       <v-card-text v-if="presidentialVetoVote===false">The President has decided NOT to veto this hand. Pick your poison.</v-card-text>
+      <div v-if="presidentialVetoVote!=null">
+        <v-btn @click="resumeTurn()">Continue</v-btn>
+      </div>
     </div>
   </v-card>
 
@@ -73,6 +76,13 @@ export default {
     },
     presidentVote (vote) {
       firebase.firestore().collection('root').doc('game-room').update({ presidentialVetoVote: vote }) 
+    },
+    resumeTurn () {
+      if (this.presidentialVetoVote === true) {
+        this.agree()
+      } else {
+        this.disagree()
+      }
     },
     failedGovernment () {
       if (this.failedGovernmentCount + 1 === 3) {
