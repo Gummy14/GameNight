@@ -13,10 +13,10 @@
           <v-btn @click="presidentVote(false)">Disagree</v-btn>
         </v-card-actions>
       </div>
-      <div v-if="presidentialVetoVote===null">
-        <v-card-text v-if="presidentialVetoVote===true">You have chosen to veto this hand</v-card-text>
-        <v-card-text v-if="presidentialVetoVote===false">You have chosen NOT to veto this hand</v-card-text>
-        <v-card-text v-if="presidentialVetoVote===null">Currently awaiting your Chancellor's confirmation</v-card-text>
+      <div v-else-if="presidentialVetoVote != null">
+        <v-card-text v-if="presidentialVetoVote === true">You have chosen to veto this hand</v-card-text>
+        <v-card-text v-if="presidentialVetoVote === false">You have chosen NOT to veto this hand</v-card-text>
+        <v-card-text v-if="presidentialVetoVote != null">Currently awaiting your Chancellor's confirmation</v-card-text>
       </div>
     </div>
     <div v-else-if="user.office === 'Chancellor'">
