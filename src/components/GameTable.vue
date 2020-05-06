@@ -165,6 +165,10 @@
         </investigation-results>
       </v-dialog>
 
+      <v-dialog v-model="callingForVeto" persistent max-width="450">
+        <veto></veto>
+      </v-dialog>
+
     </div>
   </div>
 </template>
@@ -176,13 +180,15 @@ import { mapState } from 'vuex'
 import PlayerCard from './PlayerCard'
 import GameOver from './GameOver'
 import InvestigationResults from './InvestigationResults'
+import Veto from './Veto'
 export default {
   name: 'game-table',
   components: {
     draggable,
     PlayerCard,
     GameOver,
-    InvestigationResults
+    InvestigationResults,
+    Veto
   },
   data() {
     return {
@@ -222,7 +228,10 @@ export default {
         graveyard: [],
         failedGovernmentCount: 0,
         previousChancellor: '',
-        nextPresidentPosition: -1
+        nextPresidentPosition: -1,
+        vetoUnlocked: false,
+        callingForVeto: false,
+        presidentialVetoVote: null
       },
       isGameOver: false,
       isInvestigationOver: false,
@@ -247,29 +256,36 @@ export default {
       needToInvestigatePlayer: 'needToInvestigatePlayer',
       needToPickNewPresident: 'needToPickNewPresident',
       nextPresidentPosition: 'nextPresidentPosition',
-      previousChancellor: 'previousChancellor'
+      previousChancellor: 'previousChancellor',
+      callingForVeto: 'callingForVeto'
     })
   },
   mounted () {
     var self = this
     firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
-      if (doc.data().policies.length === 2) {
-        self.handOff()
-      }
-
       if (doc.data().president?.userId === self.user.userId) {
-        self.$store.commit('setUser', {
-          User: doc.data().president
-        })
+        if (self.user.office != 'President') {
+          self.hand = []
+          self.$store.commit('setUser', {
+            User: doc.data().president
+          })
+        }
       } else if (doc.data().chancellor?.userId === self.user.userId) {
-        self.$store.commit('setUser', {
-          User: doc.data().chancellor
-        })
+        if (self.user.office != 'Chancellor') {
+          self.hand = []
+          self.$store.commit('setUser', {
+            User: doc.data().chancellor
+          })
+        }
       } else if (doc.data().nominee?.userId === self.user.userId) {
-        self.$store.commit('setUser', {
-          User: doc.data().nominee
-        })
+        if (self.user.office != 'Nominee') {
+          self.hand = []
+          self.$store.commit('setUser', {
+            User: doc.data().nominee
+          })
+        }
       } else {
+        self.hand = []
         self.user.office = 'None'
         self.$store.commit('setUser', {
           User: self.user
@@ -297,7 +313,7 @@ export default {
         Chancellor: doc.data().chancellor
       })
       
-      if (doc.data().chancellor != null && doc.data().chancellor.isHitler) {
+      if (doc.data().chancellor != null && doc.data().chancellor.isHitler && self.fascistBoard.length >= 3) {
         self.isGameOver = true
       }
 
@@ -326,6 +342,9 @@ export default {
       self.$store.commit('setPolicies', {
         Policies: doc.data().policies
       })
+      if (doc.data().policies.length === 2) {
+        self.handOff()
+      }
 
       self.$store.commit('setFailedGovernmentCount', {
         FailedGovernmentCount: doc.data().failedGovernmentCount
@@ -349,6 +368,18 @@ export default {
 
       self.$store.commit('setNextPresidentPosition', {
         NextPresidentPosition: doc.data().nextPresidentPosition
+      })
+
+      self.$store.commit('setVetoUnlocked', {
+        VetoUnlocked: doc.data().vetoUnlocked
+      })
+
+      self.$store.commit('setCallingForVeto', {
+        CallingForVeto: doc.data().callingForVeto
+      })
+
+      self.$store.commit('setPresidentialVetoVote', {
+        PresidentialVetoVote: doc.data().presidentialVetoVote
       })
 
     })
@@ -409,8 +440,9 @@ export default {
       this.setUpGame()
     },
     addPolicy () {
-      firebase.firestore().collection('root').doc('game-room').update({ policies: this.hand })
+      var policiesToHandOff = this.hand
       this.hand = []
+      firebase.firestore().collection('root').doc('game-room').update({ policies: policiesToHandOff })
     },
     removePolicyFromDeck () {
       firebase.firestore().collection('root').doc('game-room').update({ deck: this.deck })
@@ -442,6 +474,7 @@ export default {
       }
     },
     handOff() {
+      console.log('HERE', this.user.office === 'Chancellor', this.policies)
       if (this.user.office === 'Chancellor') {
         this.hand = this.policies
       }
@@ -780,6 +813,10 @@ export default {
   height: 125px;
   display: grid;
   margin-top: 350px;
+}
+.back {
+  background-image: url("../assets/policy-card-back.png");
+  background-size: 100%;
 }
 .back {
   background-image: url("../assets/policy-card-back.png");

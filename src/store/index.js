@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: undefined,
+    user: null,
     crowd: [],
     fascistBoard: [],
     liberalBoard: [],
@@ -21,7 +21,10 @@ export default new Vuex.Store({
     needToInvestigatePlayer: false,
     needToPickNewPresident: false,
     previousChancellor: '',
-    nextPresidentPosition: -1
+    nextPresidentPosition: -1,
+    vetoUnlocked: false,
+    callingForVeto: false,
+    presidentialVetoVote: null
   },
   mutations: {
     setUser (state, payload) {
@@ -75,12 +78,21 @@ export default new Vuex.Store({
     setNextPresidentPosition (state, payload) {
       state.nextPresidentPosition = payload.NextPresidentPosition
     },
+    setVetoUnlocked (state, payload) {
+      state.vetoUnlocked = payload.VetoUnlocked
+    },
+    setCallingForVeto (state, payload) {
+      state.callingForVeto = payload.CallingForVeto
+    },
     resetPresidentialPowers (state) {
       state.needToKillPlayer = false,
       state.needToPeekCards = false,
       state.needToInvestigatePlayer = false,
       state.needToPickNewPresident = false,
       state.nextPresidentPosition = -1
+    },
+    setPresidentialVetoVote (state, payload) {
+      state.presidentialVetoVote = payload.PresidentialVetoVote
     },
     clearStore (state) {
       state.user = undefined,
@@ -99,7 +111,10 @@ export default new Vuex.Store({
       state.needToInvestigatePlayer = false,
       state.needToPickNewPresident = false,
       state.previousChancellor = '',
-      state.nextPresidentPosition = -1
+      state.nextPresidentPosition = -1,
+      state.vetoUnlocked = false,
+      state.callingForVeto = false,
+      state.presidentialVetoVote = null
     }
   },
   actions: {
@@ -155,6 +170,15 @@ export default new Vuex.Store({
     },
     getNextPresidentPosition (state) {
       return state.nextPresidentPosition
+    },
+    getVetoUnlocked (state) {
+      return state.vetoUnlocked
+    },
+    getCallingForVeto (state) {
+      return state.callingForVeto
+    },
+    getpresidentialVetoVote (state) {
+      return state.presidentialVetoVote
     }
   }
 })

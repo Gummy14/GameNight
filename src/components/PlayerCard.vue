@@ -11,20 +11,20 @@
                 tile
                 size="100"
                 v-if="user.party==='Fascist'" class="fascist"
-                ></v-list-item-avatar>
+            ></v-list-item-avatar>
             <v-list-item-avatar
                 tile
                 size="100"
                 v-else class="liberal"
-                ></v-list-item-avatar>
-                
+            ></v-list-item-avatar>
         </v-list-item>
         <v-card-actions>
-            <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(true)">Vote Ja!</v-btn>
-            <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
-            <v-btn outlined v-if="needToKillPlayer" :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
-            <v-btn outlined v-if="needToInvestigatePlayer" :disabled="this.user.office != 'President'" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
-            <v-btn outlined v-if="needToPickNewPresident" :disabled="this.user.office != 'President'" @click="makePresident()">SELECT AS PRESIDENT</v-btn>
+          <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(true)">Vote Ja!</v-btn>
+          <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
+          <v-btn outlined v-if="needToKillPlayer" :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
+          <v-btn outlined v-if="needToInvestigatePlayer" :disabled="this.user.office != 'President'" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
+          <v-btn outlined v-if="needToPickNewPresident" :disabled="this.user.office != 'President'" @click="makePresident()">SELECT AS PRESIDENT</v-btn>
+          <v-btn outlined v-if="vetoUnlocked && this.user.office === 'Chancellor'" @click="veto()">CALL FOR VETO</v-btn>
         </v-card-actions>
     </div>
   </v-card>
@@ -56,8 +56,9 @@ export default {
       needToInvestigatePlayer: 'needToInvestigatePlayer',
       needToPickNewPresident: 'needToPickNewPresident',
       previousChancellor: 'previousChancellor',
-      president: 'president'
-      }),
+      president: 'president',
+      vetoUnlocked: 'vetoUnlocked'
+    }),
     isHitler() {
       if (this.user.isHitler === true) {
           return 'You ARE Hitler'
@@ -236,6 +237,9 @@ export default {
         }
       }
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: null, president: president, nextPresidentPosition: nextPresidentPosition})
+    },
+    veto () {
+      firebase.firestore().collection('root').doc('game-room').update({ callingForVeto: true })
     }
   }
 }
