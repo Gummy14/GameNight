@@ -264,21 +264,21 @@ export default {
     var self = this
     firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
       if (doc.data().president?.userId === self.user.userId) {
-        if (user.office != 'President') {
+        if (self.user.office != 'President') {
           self.hand = []
           self.$store.commit('setUser', {
             User: doc.data().president
           })
         }
       } else if (doc.data().chancellor?.userId === self.user.userId) {
-        if (user.office != 'Chancellor') {
+        if (self.user.office != 'Chancellor') {
           self.hand = []
           self.$store.commit('setUser', {
             User: doc.data().chancellor
           })
         }
       } else if (doc.data().nominee?.userId === self.user.userId) {
-        if (user.office != 'Nominee') {
+        if (self.user.office != 'Nominee') {
           self.hand = []
           self.$store.commit('setUser', {
             User: doc.data().nominee
