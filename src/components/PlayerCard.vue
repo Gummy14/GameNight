@@ -122,9 +122,9 @@ export default {
     },
     makeNomineeChancellor() {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
-      this.previousGovernment = []
-      this.previousGovernment.push(this.crowd[this.chancellorNomineeCrowdIndex].userId, this.president.userId)
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousGovernment: this.previousGovernment })
+      var previousGovernment = []
+      previousGovernment.push(this.crowd[this.chancellorNomineeCrowdIndex].userId, this.president.userId)
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousGovernment: previousGovernment })
     },
     changePresident (player) {
       var lastPlayer = this.crowd.length - 1

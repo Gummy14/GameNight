@@ -477,7 +477,6 @@ export default {
       }
     },
     handOff() {
-      console.log('HERE', this.user.office === 'Chancellor', this.policies)
       if (this.user.office === 'Chancellor') {
         this.hand = this.policies
       }
