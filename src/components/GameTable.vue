@@ -585,45 +585,59 @@ export default {
       }
       return roleSet
     },
-    newTurn (policyAdded) {
-      if (policyAdded === 0 && (this.fascistBoard.length === 1) && (this.crowd.length >= 9)) {
-        //investigate player
-        this.$store.commit('setNeedToInvestigatePlayer', {
-          NeedToInvestigatePlayer: true
-        })
-        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+    newTurn () {
+      var crowdLength = this.crowd.length
 
-      } else if (policyAdded === 0 && (this.fascistBoard.length === 2) && (this.crowd.length >= 7)) {
-        //investigate player
-        this.$store.commit('setNeedToInvestigatePlayer', {
-          NeedToInvestigatePlayer: true
-        })
-        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
-
-      } else if (policyAdded === 0 && (this.fascistBoard.length === 3) && (this.crowd.length >= 7)) {
-        //president picks new president
-        this.$store.commit('setNeedToPickNewPresident', {
-          NeedToPickNewPresident: true
-        })
-        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
-
-      } else if (policyAdded === 0 && (this.fascistBoard.length === 3) && (this.crowd.length === 5 || this.crowd.length === 6)) {
-        //president peaks at top 3 polices
-        this.$store.commit('setNeedToPeekCards', {
-          NeedToPeekCards: true
-        })
-        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
-
-      } else if (policyAdded === 0 && (this.fascistBoard.length === 4 || this.fascistBoard.length === 5)) {
-        //president kills someone
-        this.$store.commit('setNeedToKillPlayer', {
-          NeedToKillPlayer: true
-        })
-        firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard, vetoUnlocked: this.fascistBoard.length === 5 })
-
-      } else {
-        //president takes no action
-        this.movePresidentToNextPlayer()
+      switch (this.fascistBoard.length) {
+        // investigate someone on a 9-10 player board
+        case 1:
+          if (crowdLength >= 9) {
+            this.$store.commit('setNeedToInvestigatePlayer', {
+              NeedToInvestigatePlayer: true
+            })
+            firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+          }
+          break
+        // investigate someone on a 7-8 or 9-10 player board
+        case 2:
+          if (crowdLength >= 7) {
+            this.$store.commit('setNeedToInvestigatePlayer', {
+              NeedToInvestigatePlayer: true
+            })
+            firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+          }
+          break
+        // pick a new president for one turn on a 7-8 board or peek cards on a 5-6 board
+        case 3:
+          if (crowdLength >= 7) {
+            this.$store.commit('setNeedToPickNewPresident', {
+              NeedToPickNewPresident: true
+            })
+            firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+          } else if (crowdLength === 5 || crowdLength === 6) {
+              this.$store.commit('setNeedToPeekCards', {
+                NeedToPeekCards: true
+              })
+              firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+            }
+          break
+        // president must kill a player
+        case 4:
+          this.$store.commit('setNeedToKillPlayer', {
+            NeedToKillPlayer: true
+          })
+          firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+          break
+        // president must kill a player + veto power is unlocked
+        case 5:
+          this.$store.commit('setNeedToKillPlayer', {
+            NeedToKillPlayer: true
+          })
+          firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard, vetoUnlocked: true })
+          break
+        // a liberal policy gets played
+        default:
+          this.movePresidentToNextPlayer()
       }
     },
     getPresident() {
