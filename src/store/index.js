@@ -20,7 +20,7 @@ export default new Vuex.Store({
     needToPeekCards: false,
     needToInvestigatePlayer: false,
     needToPickNewPresident: false,
-    previousChancellor: '',
+    previousGovernment: [],
     nextPresidentPosition: -1,
     vetoUnlocked: false,
     callingForVeto: false,
@@ -72,8 +72,8 @@ export default new Vuex.Store({
     setNeedToPickNewPresident (state, payload) {
       state.needToPickNewPresident = payload.NeedToPickNewPresident
     },
-    setPreviousChancellor (state, payload) {
-      state.previousChancellor = payload.PreviousChancellor
+    setPreviousGovernment (state, payload) {
+      state.previousGovernment = payload.PreviousGovernment
     },
     setNextPresidentPosition (state, payload) {
       state.nextPresidentPosition = payload.NextPresidentPosition
@@ -110,7 +110,7 @@ export default new Vuex.Store({
       state.needToPeekCards = false,
       state.needToInvestigatePlayer = false,
       state.needToPickNewPresident = false,
-      state.previousChancellor = '',
+      state.previousGovernment = [],
       state.nextPresidentPosition = -1,
       state.vetoUnlocked = false,
       state.callingForVeto = false,
@@ -165,8 +165,8 @@ export default new Vuex.Store({
     getNeedToPickNewPresident (state) {
       return state.needToPickNewPresident
     },
-    getPreviousChancellor (state) {
-      return state.previousChancellor
+    getPreviousGovernment (state) {
+      return state.previousGovernment
     },
     getNextPresidentPosition (state) {
       return state.nextPresidentPosition

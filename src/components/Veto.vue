@@ -52,7 +52,7 @@ export default {
       liberalBoard: 'liberalBoard', 
       deck: 'deck',
       nominee: 'nominee',
-      previousChancellor: 'previousChancellor',
+      previousGovernment: 'previousGovernment',
       president: 'president',
       user: 'user',
       presidentialVetoVote: 'presidentialVetoVote'

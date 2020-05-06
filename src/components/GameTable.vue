@@ -7,10 +7,13 @@
         <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player)">
           <div v-if="user.office === 'President' && player.office != 'President'">
             <div v-if="!needToKillPlayer && !needToInvestigatePlayer && !needToPickNewPresident">
-              <v-list-item  v-if="player.userId != previousChancellor" @click="nominate(index, 'Chancellor Nominee')"> 
+              <v-list-item  v-if="previousGovernment.length === 2 && player.userId != previousGovernment[0] && player.userId != previousGovernment[1]" @click="nominate(index, 'Chancellor Nominee')"> 
                 {{ player.username }}
               </v-list-item>
-              <v-list-item  v-else-if="player.userId === previousChancellor"> 
+              <v-list-item  v-else-if="previousGovernment.length === 2 && player.userId === previousGovernment[0] || player.userId === previousGovernment[1]"> 
+                {{ player.username }}
+              </v-list-item>
+              <v-list-item v-else-if="previousGovernment.length === 0" @click="nominate(index, 'Chancellor Nominee')">
                 {{ player.username }}
               </v-list-item>
             </div>
@@ -227,7 +230,7 @@ export default {
         policies: [],
         graveyard: [],
         failedGovernmentCount: 0,
-        previousChancellor: '',
+        previousGovernment: [],
         nextPresidentPosition: -1,
         vetoUnlocked: false,
         callingForVeto: false,
@@ -256,7 +259,7 @@ export default {
       needToInvestigatePlayer: 'needToInvestigatePlayer',
       needToPickNewPresident: 'needToPickNewPresident',
       nextPresidentPosition: 'nextPresidentPosition',
-      previousChancellor: 'previousChancellor',
+      previousGovernment: 'previousGovernment',
       callingForVeto: 'callingForVeto'
     })
   },
@@ -362,8 +365,8 @@ export default {
         Graveyard: doc.data().graveyard
       })
 
-      self.$store.commit('setPreviousChancellor', {
-        PreviousChancellor: doc.data().previousChancellor
+      self.$store.commit('setPreviousGovernment', {
+        PreviousGovernment: doc.data().previousGovernment
       })
 
       self.$store.commit('setNextPresidentPosition', {
