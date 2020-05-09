@@ -266,39 +266,9 @@ export default {
   mounted () {
     var self = this
     firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
-      if (doc.data().president?.userId === self.user.userId) {
-        if (self.user.office != 'President') {
-          self.hand = []
-          self.$store.commit('setUser', {
-            User: doc.data().president
-          })
-        }
-      } else if (doc.data().chancellor?.userId === self.user.userId) {
-        if (self.user.office != 'Chancellor') {
-          self.hand = []
-          self.$store.commit('setUser', {
-            User: doc.data().chancellor
-          })
-        }
-      } else if (doc.data().nominee?.userId === self.user.userId) {
-        if (self.user.office != 'Nominee') {
-          self.hand = []
-          self.$store.commit('setUser', {
-            User: doc.data().nominee
-          })
-        }
-      } else {
-        self.hand = []
-        self.user.office = 'None'
-        self.$store.commit('setUser', {
-          User: self.user
-        })
-      }
-
       self.$store.commit('setCrowd', {
         Crowd: doc.data().crowd
       })
-
       for (let i = 0; i < self.crowd.length; i++) {
         if (self.crowd[i].userId === self.user.userId) {
           self.$store.commit('setUser', {
@@ -315,7 +285,6 @@ export default {
       self.$store.commit('setChancellor', {
         Chancellor: doc.data().chancellor
       })
-      
       if (doc.data().chancellor != null && doc.data().chancellor.isHitler && self.fascistBoard.length >= 3) {
         self.isGameOver = true
       }
@@ -384,7 +353,6 @@ export default {
       self.$store.commit('setPresidentialVetoVote', {
         PresidentialVetoVote: doc.data().presidentialVetoVote
       })
-
     })
   },
   methods: {
@@ -588,6 +556,7 @@ export default {
       return roleSet
     },
     newTurn (policyAdded) {
+      this.hand = []
       var crowdLength = this.crowd.length
       if (policyAdded === 0) {
         switch (this.fascistBoard.length) {
@@ -701,6 +670,7 @@ export default {
       }
     },
     movePresidentToNextPlayer () {
+      this.hand = []
       if (this.nextPresidentPosition != -1) {
         this.clearOffices()
         var nextPresident = this.crowd[this.nextPresidentPosition]
@@ -814,7 +784,6 @@ export default {
   width: 75px;
   height: 125px;
   display: grid;
-  margin-top: 350px;
 }
 .back {
   background-image: url("../assets/policy-card-back.png");
@@ -839,7 +808,6 @@ export default {
 .discard-stack {
   width: 88px;
   height: 132px;
-  margin-top: 350px;
 }
 .title {
   padding-top: 0px;
