@@ -80,7 +80,7 @@
                 </v-card>
               </draggable>
             </v-img>
-            <v-img v-else-if="this.crowd.length > 7 && this.crowd.length < 9" src="../assets/fascist-board-7-8.png" width="100%">
+            <v-img v-else-if="this.crowd.length === 7 || this.crowd.length === 8" src="../assets/fascist-board-7-8.png" width="100%">
               <draggable 
                 class="fascist-board" 
                 :list="fascistBoard" 
@@ -327,8 +327,47 @@ export default {
       self.$store.commit('setFascistBoard', {
         FascistBoard: doc.data().fascistBoard
       })
-      if (doc.data().fascistBoard.length === 6) {
-        self.isGameOver = true
+      switch (doc.data().fascistBoard.length) {
+        case 1:
+          if (self.crowd.length >= 9) {
+            self.$store.commit('setNeedToInvestigatePlayer', {
+              NeedToInvestigatePlayer: true
+            })
+          }
+          break
+        case 2:
+          if (self.crowd.length >= 7) {
+            self.$store.commit('setNeedToInvestigatePlayer', {
+              NeedToInvestigatePlayer: true
+            })
+          }
+          break
+        case 3:
+          if (self.crowd.length >= 7) {
+            self.$store.commit('setNeedToPickNewPresident', {
+              NeedToPickNewPresident: true
+            })
+          } else if (self.crowd.length === 5 || self.crowd.length === 6) {
+            self.$store.commit('setNeedToPeekCards', {
+              NeedToPeekCards: true
+            })
+          }
+          break
+        case 4:
+          self.$store.commit('setNeedToKillPlayer', {
+            NeedToKillPlayer: true
+          })
+          break
+        case 5:
+          self.$store.commit('setNeedToKillPlayer', {
+            NeedToKillPlayer: true
+          })
+          break
+        case 6:
+          self.isGameOver = true
+          break
+        default:
+          break
       }
 
       self.$store.commit('setLiberalBoard', {
@@ -591,57 +630,29 @@ export default {
       var crowdLength = this.crowd.length
       if (policyAdded === 0) {
         switch (this.fascistBoard.length) {
-          // investigate someone on a 9-10 player board
           case 1:
             if (crowdLength >= 9) {
-              this.$store.commit('setNeedToInvestigatePlayer', {
-                NeedToInvestigatePlayer: true
-              })
               firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
             } else {
               this.movePresidentToNextPlayer()
             }
             break
-          // investigate someone on a 7-8 or 9-10 player board
           case 2:
             if (crowdLength >= 7) {
-              this.$store.commit('setNeedToInvestigatePlayer', {
-                NeedToInvestigatePlayer: true
-              })
               firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
             } else {
               this.movePresidentToNextPlayer()
             }
             break
-          // pick a new president for one turn on a 7-8 board or peek cards on a 5-6 board
           case 3:
-            if (crowdLength >= 7) {
-              this.$store.commit('setNeedToPickNewPresident', {
-                NeedToPickNewPresident: true
-              })
-              firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
-            } else if (crowdLength === 5 || crowdLength === 6) {
-                this.$store.commit('setNeedToPeekCards', {
-                  NeedToPeekCards: true
-                })
-                firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
-              }
-            break
-          // president must kill a player
-          case 4:
-            this.$store.commit('setNeedToKillPlayer', {
-              NeedToKillPlayer: true
-            })
             firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
             break
-          // president must kill a player + veto power is unlocked
+          case 4:
+            firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard })
+            break
           case 5:
-            this.$store.commit('setNeedToKillPlayer', {
-              NeedToKillPlayer: true
-            })
             firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard, vetoUnlocked: true })
             break
-          // a liberal policy gets played
           default:
             this.movePresidentToNextPlayer()
         } 
