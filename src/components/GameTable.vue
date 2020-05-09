@@ -64,7 +64,7 @@
       <div>
         <div class="board">
           <v-card dark class="board">
-            <v-img v-if="this.crowd.length > 4 && this.crowd.length < 7" src="../assets/fascist-board.png" width="100%">
+            <v-img v-if="this.crowd.length < 7" src="../assets/fascist-board.png" width="100%" :disabled="this.crowd.length < 5">
               <draggable 
                 class="fascist-board" 
                 :list="fascistBoard" 
