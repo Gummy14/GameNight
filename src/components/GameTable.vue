@@ -324,50 +324,57 @@ export default {
         Nominee: doc.data().nominee
       })
 
+      var didAddFascistPolicy = false
+      if (doc.data().fascistBoard.length > self.fascistBoard.length) {
+        didAddFascistPolicy = true
+      }
       self.$store.commit('setFascistBoard', {
         FascistBoard: doc.data().fascistBoard
       })
-      switch (doc.data().fascistBoard.length) {
-        case 1:
-          if (self.crowd.length >= 9) {
-            self.$store.commit('setNeedToInvestigatePlayer', {
-              NeedToInvestigatePlayer: true
+      if (didAddFascistPolicy) {
+        switch (doc.data().fascistBoard.length) {
+          case 1:
+            if (self.crowd.length >= 9) {
+              self.$store.commit('setNeedToInvestigatePlayer', {
+                NeedToInvestigatePlayer: true
+              })
+            }
+            break
+          case 2:
+            if (self.crowd.length >= 7) {
+              self.$store.commit('setNeedToInvestigatePlayer', {
+                NeedToInvestigatePlayer: true
+              })
+            }
+            break
+          case 3:
+            if (self.crowd.length >= 7) {
+              self.$store.commit('setNeedToPickNewPresident', {
+                NeedToPickNewPresident: true
+              })
+            } else if (self.crowd.length === 5 || self.crowd.length === 6) {
+              self.$store.commit('setNeedToPeekCards', {
+                NeedToPeekCards: true
+              })
+            }
+            break
+          case 4:
+            self.$store.commit('setNeedToKillPlayer', {
+              NeedToKillPlayer: true
             })
-          }
-          break
-        case 2:
-          if (self.crowd.length >= 7) {
-            self.$store.commit('setNeedToInvestigatePlayer', {
-              NeedToInvestigatePlayer: true
+            break
+          case 5:
+            self.$store.commit('setNeedToKillPlayer', {
+              NeedToKillPlayer: true
             })
-          }
-          break
-        case 3:
-          if (self.crowd.length >= 7) {
-            self.$store.commit('setNeedToPickNewPresident', {
-              NeedToPickNewPresident: true
-            })
-          } else if (self.crowd.length === 5 || self.crowd.length === 6) {
-            self.$store.commit('setNeedToPeekCards', {
-              NeedToPeekCards: true
-            })
-          }
-          break
-        case 4:
-          self.$store.commit('setNeedToKillPlayer', {
-            NeedToKillPlayer: true
-          })
-          break
-        case 5:
-          self.$store.commit('setNeedToKillPlayer', {
-            NeedToKillPlayer: true
-          })
-          break
-        case 6:
-          self.isGameOver = true
-          break
-        default:
-          break
+            break
+          case 6:
+            self.isGameOver = true
+            break
+          default:
+            break
+        }
+        didAddFascistPolicy = false
       }
 
       self.$store.commit('setLiberalBoard', {

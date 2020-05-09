@@ -21,10 +21,10 @@
         <v-card-actions>
           <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(true)">Vote Ja!</v-btn>
           <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
-          <v-btn outlined v-if="needToKillPlayer" :disabled="this.user.office != 'President'" @click="killPlayer()">FINISH HIM</v-btn>
-          <v-btn outlined v-if="needToInvestigatePlayer" :disabled="this.user.office != 'President'" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
-          <v-btn outlined v-if="needToPickNewPresident" :disabled="this.user.office != 'President'" @click="makePresident()">SELECT AS PRESIDENT</v-btn>
-          <v-btn outlined v-if="vetoUnlocked && this.user.office === 'Chancellor'" @click="veto()">CALL FOR VETO</v-btn>
+          <v-btn outlined v-if="needToKillPlayer && this.user.office === 'President'" :disabled="nominee === null" @click="killPlayer()">FINISH HIM</v-btn>
+          <v-btn outlined v-if="needToInvestigatePlayer && this.user.office === 'President'" :disabled="nominee === null" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
+          <v-btn outlined v-if="needToPickNewPresident && this.user.office === 'President'" :disabled="nominee === null" @click="makePresident()">SELECT AS PRESIDENT</v-btn>
+          <v-btn outlined v-if="vetoUnlocked && this.user.office === 'Chancellor'" :disabled="nominee === null" @click="veto()">CALL FOR VETO</v-btn>
         </v-card-actions>
     </div>
   </v-card>
