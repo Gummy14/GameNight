@@ -14,6 +14,8 @@
         label="Email"
         v-model="email"
         :rules="emailRules"
+        hint="E-mail must be valid"
+        validate-on-blur
         required
       ></v-text-field>
       <v-text-field 
@@ -22,6 +24,8 @@
         type="password"
         v-model="password"
         :rules="passwordRules"
+        hint="Password must be longer than 5 characters"
+        validate-on-blur
         required
       ></v-text-field>
       <v-text-field 
@@ -30,10 +34,13 @@
         type="password"
         v-model="passwordConfirm"
         :rules="passwordRules"
+        hint="Passwords must match"
+        validate-on-blur
         required
       ></v-text-field>
       <v-btn :disabled="!isValid" @click="signUp" class="login-btn">Confirm and Login</v-btn>
       </v-form>
+      <v-alert class="alert" v-model="arePasswordsDifferent" type="error">Passwords Do Not Match</v-alert>
     </div>
   </v-card>
 </template>
@@ -60,14 +67,18 @@ export default {
       passwordRules: [
         v => !!v || 'Password is required',
         v => v.length > 5 || 'Password must be greater than 5 characters'
-      ]
+      ],
+      arePasswordsDifferent: false
     }
   },
   methods: {
     signUp () {
       var db = firebase.firestore()
       var self = this
-      firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
+      if (this.password != this.passwordConfirm) {
+        this.arePasswordsDifferent = true
+      } else {
+        firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(
         function () {
           var currentUser = firebase.auth().currentUser
 
@@ -110,6 +121,7 @@ export default {
           alert('Failed to sign up!' + error.message)
         }
       )
+      }
     }
   }
 }
@@ -124,5 +136,8 @@ export default {
 }
 .login-btn {
   margin-right: 20px;
+}
+.alert {
+  margin-top: 10px;
 }
 </style>
