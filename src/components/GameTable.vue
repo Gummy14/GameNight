@@ -64,7 +64,7 @@
       <div>
         <div class="board">
           <v-card dark class="board">
-            <v-img src="../assets/fascist-board.png" width="100%">
+            <v-img v-if="this.crowd.length > 4 && this.crowd.length < 7" src="../assets/fascist-board.png" width="100%">
               <draggable 
                 class="fascist-board" 
                 :list="fascistBoard" 
@@ -72,7 +72,38 @@
                 @change="newTurn(0)"
                 :disabled="user.office != 'Chancellor' || hand.length != 1"
               >
-
+                <v-card
+                  :class="applyClass(element.type)"
+                  v-for="(element) in fascistBoard"
+                  :key="element.id"
+                >
+                </v-card>
+              </draggable>
+            </v-img>
+            <v-img v-else-if="this.crowd.length > 7 && this.crowd.length < 9" src="../assets/fascist-board-7-8.png" width="100%">
+              <draggable 
+                class="fascist-board" 
+                :list="fascistBoard" 
+                group="cards" 
+                @change="newTurn(0)"
+                :disabled="user.office != 'Chancellor' || hand.length != 1"
+              >
+                <v-card
+                  :class="applyClass(element.type)"
+                  v-for="(element) in fascistBoard"
+                  :key="element.id"
+                >
+                </v-card>
+              </draggable>
+            </v-img>
+            <v-img v-else-if="this.crowd.length > 8 && this.crowd.length <= 10" src="../assets/fascist-board-9-10.png" width="100%">
+              <draggable 
+                class="fascist-board" 
+                :list="fascistBoard" 
+                group="cards" 
+                @change="newTurn(0)"
+                :disabled="user.office != 'Chancellor' || hand.length != 1"
+              >
                 <v-card
                   :class="applyClass(element.type)"
                   v-for="(element) in fascistBoard"
