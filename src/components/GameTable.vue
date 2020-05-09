@@ -326,7 +326,6 @@ export default {
 
       var didAddFascistPolicy = false
       if (doc.data().fascistBoard.length > self.fascistBoard.length) {
-        self.$store.commit('resetPresidentialPowers')
         didAddFascistPolicy = true
       }
       self.$store.commit('setFascistBoard', {
@@ -721,6 +720,7 @@ export default {
     },
     movePresidentToNextPlayer () {
       this.hand = []
+      this.$store.commit('resetPresidentialPowers')
       if (this.nextPresidentPosition != -1) {
         this.clearOffices()
         var nextPresident = this.crowd[this.nextPresidentPosition]
