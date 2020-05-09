@@ -114,7 +114,7 @@ export default {
           yesVotes++
         }
       }
-      if (yesVotes > minimumVotesNeeded) {
+      if (yesVotes >= minimumVotesNeeded) {
         this.makeNomineeChancellor()
       } else {
         this.failedGovernment()
