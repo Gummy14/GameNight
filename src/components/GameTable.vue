@@ -1,40 +1,7 @@
 <template>
   <div class="overlord">
-    <v-card dark class="login">
-      <v-list>
-        <v-subheader class="space">PLAYERS</v-subheader>
-        <v-divider></v-divider>
-        <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player)">
-          <div v-if="user.office === 'President' && player.office != 'President'">
-            <div v-if="!needToKillPlayer && !needToInvestigatePlayer && !needToPickNewPresident">
-              <v-list-item  v-if="previousGovernment.length === 2 && player.userId != previousGovernment[0] && player.userId != previousGovernment[1]" @click="nominate(index, 'Chancellor Nominee')"> 
-                {{ player.username }}
-              </v-list-item>
-              <v-list-item  v-else-if="previousGovernment.length === 2 && player.userId === previousGovernment[0] || player.userId === previousGovernment[1]"> 
-                {{ player.username }}
-              </v-list-item>
-              <v-list-item v-else-if="previousGovernment.length === 0" @click="nominate(index, 'Chancellor Nominee')">
-                {{ player.username }}
-              </v-list-item>
-            </div>
-            <v-list-item v-else-if="needToKillPlayer" @click="nominate(index, 'Sentenced')"> 
-              {{ player.username }}
-            </v-list-item>
-            <v-list-item v-else-if="needToInvestigatePlayer" @click="nominate(index, 'Under Investigation')"> 
-              {{ player.username }}
-            </v-list-item>
-            <v-list-item v-else-if="needToPickNewPresident" @click="nominate(index, 'New President')"> 
-              {{ player.username }}
-            </v-list-item>
-          </div>
-          <v-list-item v-else> 
-            {{ player.username }}
-          </v-list-item>
-          <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
-        </div> 
-      </v-list>
-    </v-card>
-
+    <player-list></player-list>
+    
     <div class="table">
       <div class="small-board">
         <v-card-title class="title">Policy Deck</v-card-title>
@@ -215,6 +182,7 @@ import PlayerCard from './PlayerCard'
 import GameOver from './GameOver'
 import InvestigationResults from './InvestigationResults'
 import Veto from './Veto'
+import PlayerList from './PlayerList'
 export default {
   name: 'game-table',
   components: {
@@ -222,7 +190,8 @@ export default {
     PlayerCard,
     GameOver,
     InvestigationResults,
-    Veto
+    Veto,
+    PlayerList
   },
   data() {
     return {
@@ -441,39 +410,6 @@ export default {
         'liberal': policyType === 1
       }
     },
-    applyOffice (player) {
-      if (this.user.party === 'Fascist' && !this.user.isHitler) {
-        return {
-          'president': player.office === 'President',
-          'chancellor': player.office === 'Chancellor',
-          'chancellor-nominee': player.office === 'Chancellor Nominee',
-          'sentenced': player.office === 'Sentenced',
-          'under-investigation': player.office === 'Under Investigation',
-          'new-president': player.office === 'New President',
-          'fascist-player': player.party === 'Fascist' && !player.isHitler,
-          'hitler' : player.isHitler
-        }
-      } else if (this.user.party === 'Fascist' && this.user.isHitler) {
-        return {
-          'president': player.office === 'President',
-          'chancellor': player.office === 'Chancellor',
-          'chancellor-nominee': player.office === 'Chancellor Nominee',
-          'sentenced': player.office === 'Sentenced',
-          'under-investigation': player.office === 'Under Investigation',
-          'new-president': player.office === 'New President',
-          'hitler' : player.isHitler
-        }
-      } else {
-        return {
-          'president': player.office === 'President',
-          'chancellor': player.office === 'Chancellor',
-          'chancellor-nominee': player.office === 'Chancellor Nominee',
-          'sentenced': player.office === 'Sentenced',
-          'under-investigation': player.office === 'Under Investigation',
-          'new-president': player.office === 'New President',
-        }
-      }
-    },
     startGame () {
       var pick = Math.floor(Math.random() * (this.crowd.length))
       this.hand = []
@@ -536,14 +472,6 @@ export default {
         this.defaultDeck[pick] = temp
       }
       return this.defaultDeck
-    },
-    nominate(nominee, nomination) {
-      this.clearNominees()
-      this.crowd.forEach(element => {
-        element.vote = null
-      })
-      this.crowd[nominee].office = nomination
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: this.crowd[nominee] })
     },
     clearNominees () {
       for (let x=0; x < this.crowd.length; x++) {
@@ -745,12 +673,6 @@ export default {
 .overlord {
   display: flex;
 }
-.login {
-  margin: 20px;
-  margin-right: 100px;
-  width: 250px;
-  height: max-content;
-}
 .table {
   display: flex;
   max-height: 100%;
@@ -874,9 +796,6 @@ export default {
   left: 50%;
   margin-right: -50%;
   transform: translate(-50%);
-}
-.space {
-  padding-left: 15px;
 }
 .player-card {
   margin-left: 10px;
