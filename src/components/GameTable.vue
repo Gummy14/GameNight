@@ -325,7 +325,7 @@ export default {
       })
 
       var didAddFascistPolicy = false
-      this.$store.commit('resetPresidentialPowers')
+      self.$store.commit('resetPresidentialPowers')
       if (doc.data().fascistBoard.length > self.fascistBoard.length) {
         didAddFascistPolicy = true
       }
