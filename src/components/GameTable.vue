@@ -309,6 +309,9 @@ export default {
         }
       }
 
+      if (doc.data().president?.userId != self.president?.userId) {
+        self.$store.commit('resetPresidentialPowers')
+      }
       self.$store.commit('setPresident', {
         President: doc.data().president
       })
@@ -720,7 +723,6 @@ export default {
     },
     movePresidentToNextPlayer () {
       this.hand = []
-      this.$store.commit('resetPresidentialPowers')
       if (this.nextPresidentPosition != -1) {
         this.clearOffices()
         var nextPresident = this.crowd[this.nextPresidentPosition]
