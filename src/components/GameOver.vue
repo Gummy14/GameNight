@@ -4,7 +4,8 @@
     <v-card-text>{{ gameWinner.description }}</v-card-text>  
     <v-card-actions>
       <v-spacer></v-spacer>  
-      <v-btn @click="emitNewGame">New Game</v-btn>  
+      <v-btn @click="emitNewGame">New Game</v-btn>
+      <v-btn @click="emitEndGame">End Game</v-btn> 
     </v-card-actions>
   </v-card>
 </template>
@@ -71,6 +72,9 @@ export default {
   methods: {
     emitNewGame() {
       this.$emit('newGame')
+    },
+    emitEndGame() {
+      this.$emit('endGame')
     }
   }
 }

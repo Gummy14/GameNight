@@ -24,7 +24,8 @@ export default new Vuex.Store({
     nextPresidentPosition: -1,
     vetoUnlocked: false,
     callingForVeto: false,
-    presidentialVetoVote: null
+    presidentialVetoVote: null,
+    isGameInProgress: false
   },
   mutations: {
     setUser (state, payload) {
@@ -84,15 +85,18 @@ export default new Vuex.Store({
     setCallingForVeto (state, payload) {
       state.callingForVeto = payload.CallingForVeto
     },
+    setPresidentialVetoVote (state, payload) {
+      state.presidentialVetoVote = payload.PresidentialVetoVote
+    },
+    setIsGameInProgress (state, payload) {
+      state.isGameInProgress = payload.IsGameInProgress
+    },
     resetPresidentialPowers (state) {
       state.needToKillPlayer = false,
       state.needToPeekCards = false,
       state.needToInvestigatePlayer = false,
       state.needToPickNewPresident = false,
       state.nextPresidentPosition = -1
-    },
-    setPresidentialVetoVote (state, payload) {
-      state.presidentialVetoVote = payload.PresidentialVetoVote
     },
     clearStore (state) {
       state.user = undefined,
@@ -114,7 +118,8 @@ export default new Vuex.Store({
       state.nextPresidentPosition = -1,
       state.vetoUnlocked = false,
       state.callingForVeto = false,
-      state.presidentialVetoVote = null
+      state.presidentialVetoVote = null,
+      state.isGameInProgress = false
     }
   },
   actions: {
@@ -179,6 +184,9 @@ export default new Vuex.Store({
     },
     getpresidentialVetoVote (state) {
       return state.presidentialVetoVote
+    },
+    getIsGameInProgress (state) {
+      return state.isGameInProgress
     }
   }
 })

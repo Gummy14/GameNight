@@ -151,7 +151,7 @@
         >
         </v-slider>
 
-        <v-btn dark class="start-button" @click="startGame">START GAME</v-btn>
+        <v-btn v-if="user.userId === crowd[0].userId && !isGameInProgress" dark class="start-button" @click="startGame">START GAME</v-btn>
         <v-card-title class="title">Player Board</v-card-title>
         <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
           <v-card class="card-hand">
@@ -190,7 +190,7 @@
       </div>
 
       <v-dialog v-model="isGameOver" persistent max-width="290">
-        <game-over @newGame="startGame">
+        <game-over @newGame="startGame" @endGame="endGame">
         </game-over>
       </v-dialog>
 
@@ -249,7 +249,6 @@ export default {
       hand: [],
       discard: [],
       hasDiscarded: false,
-      
       setUpDoc: {
         crowd: [],
         fascistBoard: [],
@@ -265,7 +264,8 @@ export default {
         nextPresidentPosition: -1,
         vetoUnlocked: false,
         callingForVeto: false,
-        presidentialVetoVote: null
+        presidentialVetoVote: null,
+        isGameInProgress: false,
       },
       isGameOver: false,
       isInvestigationOver: false,
@@ -291,7 +291,8 @@ export default {
       needToPickNewPresident: 'needToPickNewPresident',
       nextPresidentPosition: 'nextPresidentPosition',
       previousGovernment: 'previousGovernment',
-      callingForVeto: 'callingForVeto'
+      callingForVeto: 'callingForVeto',
+      isGameInProgress: 'isGameInProgress'
     })
   },
   mounted () {
@@ -433,6 +434,10 @@ export default {
       self.$store.commit('setPresidentialVetoVote', {
         PresidentialVetoVote: doc.data().presidentialVetoVote
       })
+
+      self.$store.commit('setIsGameInProgress', {
+        IsGameInProgress: doc.data().isGameInProgress
+      })
     })
   },
   methods: {
@@ -488,6 +493,20 @@ export default {
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
       this.isGameOver = false
+      this.setUpDoc.isGameInProgress = true
+      this.setUpGame()
+    },
+    endGame () {
+      this.hand = []
+      this.hasDiscarded = false
+      this.$store.commit('resetPresidentialPowers')
+      this.setUpDoc.crowd = this.clearGraveyard()
+      this.clearOffices()
+      this.clearParties()
+      this.setUpDoc.deck = this.randomizeDeck()
+      this.setUpDoc.policies = []
+      this.setUpDoc.isGameInProgress = false
+      this.isGameOver = false
       this.setUpGame()
     },
     addPolicy () {
@@ -511,6 +530,18 @@ export default {
     clearOffices () {
       for (var x = 0; x < this.crowd.length; x++) {
         this.crowd[x].office = 'None'
+      }
+    },
+    clearParties () {
+      for (var x = 0; x < this.crowd.length; x++) {
+        this.crowd[x].party = 'None'
+      }
+    },
+    clearNominees () {
+      for (let x=0; x < this.crowd.length; x++) {
+        if (this.crowd[x].office != 'President') {
+          this.crowd[x].office = 'None'
+        }
       }
     },
     clearGraveyard () {
@@ -546,13 +577,6 @@ export default {
       })
       this.crowd[nominee].office = nomination
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: this.crowd[nominee] })
-    },
-    clearNominees () {
-      for (let x=0; x < this.crowd.length; x++) {
-        if (this.crowd[x].office != 'President') {
-          this.crowd[x].office = 'None'
-        }
-      }
     },
     pickPresident (player) {
       if (player > 0) {
