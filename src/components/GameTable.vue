@@ -47,7 +47,7 @@
           >
           </v-card>
         </draggable>
-        <v-btn dark @click="restoreDeck">Restore</v-btn>
+        <v-btn dark v-if="deck.length === 0" @click="restoreDeck">Restore</v-btn>
         <v-divider></v-divider>
         <v-btn v-if="needToPeekCards && user.office === 'President'" dark @click="peekCards">Examine</v-btn>
           <transition-group name="fade" tag="ul" class="deck-stack">
@@ -378,7 +378,6 @@ export default {
           default:
             break
         }
-        didAddFascistPolicy = false
       }
 
       self.$store.commit('setLiberalBoard', {
