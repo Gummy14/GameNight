@@ -25,7 +25,7 @@ export default new Vuex.Store({
     vetoUnlocked: false,
     callingForVeto: false,
     presidentialVetoVote: null,
-    isGameOver: true
+    isGameOver: false
   },
   mutations: {
     setUser (state, payload) {
@@ -119,7 +119,7 @@ export default new Vuex.Store({
       state.vetoUnlocked = false,
       state.callingForVeto = false,
       state.presidentialVetoVote = null,
-      state.isGameOver = true
+      state.isGameOver = false
     }
   },
   actions: {

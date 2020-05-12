@@ -151,7 +151,7 @@
         >
         </v-slider>
 
-        <v-btn v-if="user.userId === crowd[0].userId && isGameOver" dark class="start-button" @click="startGame">START GAME</v-btn>
+        <v-btn v-if="user.userId === crowd[0].userId && showStartButton" dark class="start-button" @click="startGame">START GAME</v-btn>
         <v-card-title class="title">Player Board</v-card-title>
         <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
           <v-card class="card-hand">
@@ -265,10 +265,11 @@ export default {
         vetoUnlocked: false,
         callingForVeto: false,
         presidentialVetoVote: null,
-        isGameOver: null,
+        isGameOver: false,
       },
       isInvestigationOver: false,
-      investigationResults: null
+      investigationResults: null,
+      showStartButton: true
     };
   },
   computed: {
@@ -491,6 +492,7 @@ export default {
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
       this.setUpDoc.isGameOver = false
+      this.showStartButton = false
       this.setUpGame()
     },
     endGame () {
@@ -502,7 +504,8 @@ export default {
       this.clearParties()
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
-      this.setUpDoc.isGameOver = true
+      this.setUpDoc.isGameOver = false
+      this.showStartButton = true
       this.setUpGame()
     },
     addPolicy () {
