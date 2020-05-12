@@ -815,16 +815,16 @@ export default {
   background-size: 100%;
 }
 .president {
-  background: rebeccapurple;
+  background: #a06647;
 }
 .chancellor {
-  background: orange;
+  background: #5a8bb9;
 }
 .sentenced {
   background: yellow;
 }
 .chancellor-nominee {
-  background: #ff2a54;
+  background: #a4b3c1;
 }
 .under-investigation {
   background: #2aff4e;
@@ -836,16 +836,16 @@ export default {
   background: #fc5f4a;
 }
 .fascist-player-president {
-  background: linear-gradient(to right, #fc5f4a 0%, rebeccapurple 100%);
+  background: linear-gradient(to right, #fc5f4a 0%, #a06647 100%);
 }
 .fascist-player-chancellor {
-  background: linear-gradient(to right, #fc5f4a 0%, orange 100%);
+  background: linear-gradient(to right, #fc5f4a 0%, #5a8bb9 100%);
 }
 .fascist-player-sentenced {
   background: linear-gradient(to right, #fc5f4a 0%, yellow 100%);
 }
 .fascist-player-chancellor-nominee {
-  background: linear-gradient(to right, #fc5f4a 0%, #ff2a54 100%);
+  background: linear-gradient(to right, #fc5f4a 0%, #a4b3c1 100%);
 }
 .fascist-player-under-investigation {
   background: linear-gradient(to right, #fc5f4a 0%, #2aff4e 100%);
@@ -857,16 +857,16 @@ export default {
   background: #a6120f;
 }
 .hitler-president {
-  background: linear-gradient(to right, #a6120f 0%, rebeccapurple 100%);
+  background: linear-gradient(to right, #a6120f 0%, #a06647 100%);
 }
 .hitler-chancellor {
-  background: linear-gradient(to right, #a6120f 0%, orange 100%);
+  background: linear-gradient(to right, #a6120f 0%, #5a8bb9 100%);
 }
 .hitler-sentenced {
   background: linear-gradient(to right, #a6120f 0%, yellow 100%);
 }
 .hitler-chancellor-nominee {
-  background: linear-gradient(to right, #a6120f 0%, #ff2a54 100%);
+  background: linear-gradient(to right, #a6120f 0%, #a4b3c1 100%);
 }
 .hitler-under-investigation {
   background: linear-gradient(to right, #a6120f 0%, #2aff4e 100%);
