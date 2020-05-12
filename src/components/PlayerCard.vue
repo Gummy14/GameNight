@@ -124,7 +124,7 @@ export default {
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
       var previousGovernment = []
       previousGovernment.push(this.crowd[this.chancellorNomineeCrowdIndex].userId, this.president.userId)
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousGovernment: previousGovernment })
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousGovernment: previousGovernment, isGameOver: (this.crowd[this.chancellorNomineeCrowdIndex].isHitler && this.fascistBoard.length >= 3) })
     },
     changePresident (player) {
       var lastPlayer = this.crowd.length - 1
@@ -203,10 +203,14 @@ export default {
         this.graveyard.push(this.crowd[crowdIndex])
         this.crowd.splice(crowdIndex, 1)
       }
-      for (let x = 0; x < this.crowd.length; x++) {
-        if (this.crowd[x].office === 'President') {
-          this.changePresident(x)
-          break
+      if (player.isHitler) {
+        firebase.firestore().collection('root').doc('game-room').update({ isGameOver: true })
+      } else {
+        for (let x = 0; x < this.crowd.length; x++) {
+          if (this.crowd[x].office === 'President') {
+            this.changePresident(x)
+            break
+          }
         }
       }
     },

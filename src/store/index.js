@@ -25,7 +25,7 @@ export default new Vuex.Store({
     vetoUnlocked: false,
     callingForVeto: false,
     presidentialVetoVote: null,
-    isGameInProgress: false
+    isGameOver: true
   },
   mutations: {
     setUser (state, payload) {
@@ -88,8 +88,8 @@ export default new Vuex.Store({
     setPresidentialVetoVote (state, payload) {
       state.presidentialVetoVote = payload.PresidentialVetoVote
     },
-    setIsGameInProgress (state, payload) {
-      state.isGameInProgress = payload.IsGameInProgress
+    setIsGameOver (state, payload) {
+      state.isGameOver = payload.IsGameOver
     },
     resetPresidentialPowers (state) {
       state.needToKillPlayer = false,
@@ -119,7 +119,7 @@ export default new Vuex.Store({
       state.vetoUnlocked = false,
       state.callingForVeto = false,
       state.presidentialVetoVote = null,
-      state.isGameInProgress = false
+      state.isGameOver = true
     }
   },
   actions: {
@@ -185,8 +185,8 @@ export default new Vuex.Store({
     getpresidentialVetoVote (state) {
       return state.presidentialVetoVote
     },
-    getIsGameInProgress (state) {
-      return state.isGameInProgress
+    getIsGameOver (state) {
+      return state.isGameOver
     }
   }
 })

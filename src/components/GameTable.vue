@@ -151,7 +151,7 @@
         >
         </v-slider>
 
-        <v-btn v-if="user.userId === crowd[0].userId && !isGameInProgress" dark class="start-button" @click="startGame">START GAME</v-btn>
+        <v-btn v-if="user.userId === crowd[0].userId && isGameOver" dark class="start-button" @click="startGame">START GAME</v-btn>
         <v-card-title class="title">Player Board</v-card-title>
         <div v-if="user.office === 'President' || user.office === 'Chancellor'" class="board player-hand">
           <v-card class="card-hand">
@@ -265,9 +265,8 @@ export default {
         vetoUnlocked: false,
         callingForVeto: false,
         presidentialVetoVote: null,
-        isGameInProgress: false,
+        isGameOver: null,
       },
-      isGameOver: false,
       isInvestigationOver: false,
       investigationResults: null
     };
@@ -292,7 +291,7 @@ export default {
       nextPresidentPosition: 'nextPresidentPosition',
       previousGovernment: 'previousGovernment',
       callingForVeto: 'callingForVeto',
-      isGameInProgress: 'isGameInProgress'
+      isGameOver: 'isGameOver'
     })
   },
   mounted () {
@@ -320,22 +319,12 @@ export default {
       self.$store.commit('setChancellor', {
         Chancellor: doc.data().chancellor
       })
-      if (doc.data().chancellor != null && doc.data().chancellor.isHitler && self.fascistBoard.length >= 3) {
-        self.isGameOver = true
-      }
 
       self.$store.commit('setNominee', {
         Nominee: doc.data().nominee
       })
 
-      var didAddFascistPolicy = false
       if (doc.data().fascistBoard.length > self.fascistBoard.length) {
-        didAddFascistPolicy = true
-      }
-      self.$store.commit('setFascistBoard', {
-        FascistBoard: doc.data().fascistBoard
-      })
-      if (didAddFascistPolicy) {
         switch (doc.data().fascistBoard.length) {
           case 1:
             if (self.crowd.length >= 9) {
@@ -372,20 +361,17 @@ export default {
               NeedToKillPlayer: true
             })
             break
-          case 6:
-            self.isGameOver = true
-            break
           default:
             break
         }
       }
+      self.$store.commit('setFascistBoard', {
+        FascistBoard: doc.data().fascistBoard
+      })
 
       self.$store.commit('setLiberalBoard', {
         LiberalBoard: doc.data().liberalBoard
       })
-      if (doc.data().liberalBoard.length === 5) {
-        self.isGameOver = true
-      }
 
       self.$store.commit('setDeck', {
         Deck: doc.data().deck
@@ -402,14 +388,6 @@ export default {
         FailedGovernmentCount: doc.data().failedGovernmentCount
       })
       
-      if (doc.data().graveyard.length > self.graveyard) {
-        self.$store.commit('setNeedToKillPlayer', {
-          NeedToKillPlayer: false
-        })
-        if (doc.data().graveyard[doc.data().graveyard.length-1].isHitler) {
-          self.isGameOver = true
-        }
-      }
       self.$store.commit('setGraveyard', {
         Graveyard: doc.data().graveyard
       })
@@ -434,8 +412,8 @@ export default {
         PresidentialVetoVote: doc.data().presidentialVetoVote
       })
 
-      self.$store.commit('setIsGameInProgress', {
-        IsGameInProgress: doc.data().isGameInProgress
+      self.$store.commit('setIsGameOver', {
+        IsGameOver: doc.data().isGameOver
       })
     })
   },
@@ -512,8 +490,7 @@ export default {
       this.pickPresident(pick)
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
-      this.isGameOver = false
-      this.setUpDoc.isGameInProgress = true
+      this.setUpDoc.isGameOver = false
       this.setUpGame()
     },
     endGame () {
@@ -525,8 +502,7 @@ export default {
       this.clearParties()
       this.setUpDoc.deck = this.randomizeDeck()
       this.setUpDoc.policies = []
-      this.setUpDoc.isGameInProgress = false
-      this.isGameOver = false
+      this.setUpDoc.isGameOver = true
       this.setUpGame()
     },
     addPolicy () {
@@ -707,11 +683,18 @@ export default {
           case 5:
             firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard, vetoUnlocked: true })
             break
+          case 6:
+            firebase.firestore().collection('root').doc('game-room').update({ fascistBoard: this.fascistBoard, isGameOver: true })
+            break
           default:
             this.movePresidentToNextPlayer()
         } 
       } else {
-        this.movePresidentToNextPlayer()
+        if (this.liberalBoard.length === 5) {
+          firebase.firestore().collection('root').doc('game-room').update({ liberalBoard: this.liberalBoard, isGameOver: true })
+        } else {
+          this.movePresidentToNextPlayer()
+        }
       }
     },
     getPresident() {
@@ -815,7 +798,7 @@ export default {
   background-size: 100%;
 }
 .president {
-  background: #a06647;
+  background: rebeccapurple;
 }
 .chancellor {
   background: #5a8bb9;
@@ -836,7 +819,7 @@ export default {
   background: #fc5f4a;
 }
 .fascist-player-president {
-  background: linear-gradient(to right, #fc5f4a 0%, #a06647 100%);
+  background: linear-gradient(to right, #fc5f4a 0%, rebeccapurple 100%);
 }
 .fascist-player-chancellor {
   background: linear-gradient(to right, #fc5f4a 0%, #5a8bb9 100%);
@@ -857,7 +840,7 @@ export default {
   background: #a6120f;
 }
 .hitler-president {
-  background: linear-gradient(to right, #a6120f 0%, #a06647 100%);
+  background: linear-gradient(to right, #a6120f 0%, rebeccapurple 100%);
 }
 .hitler-chancellor {
   background: linear-gradient(to right, #a6120f 0%, #5a8bb9 100%);
