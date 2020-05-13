@@ -326,6 +326,7 @@ export default {
       })
 
       if (doc.data().fascistBoard.length > self.fascistBoard.length) {
+        self.$store.commit('resetPresidentialPowers')
         switch (doc.data().fascistBoard.length) {
           case 1:
             if (self.crowd.length >= 9) {

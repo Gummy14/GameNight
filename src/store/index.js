@@ -95,8 +95,7 @@ export default new Vuex.Store({
       state.needToKillPlayer = false,
       state.needToPeekCards = false,
       state.needToInvestigatePlayer = false,
-      state.needToPickNewPresident = false,
-      state.nextPresidentPosition = -1
+      state.needToPickNewPresident = false
     },
     clearStore (state) {
       state.user = undefined,

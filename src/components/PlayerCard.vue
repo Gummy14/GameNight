@@ -24,7 +24,7 @@
           <v-btn outlined v-if="needToKillPlayer && this.user.office === 'President'" :disabled="nominee === null" @click="killPlayer()">FINISH HIM</v-btn>
           <v-btn outlined v-if="needToInvestigatePlayer && this.user.office === 'President'" :disabled="nominee === null" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
           <v-btn outlined v-if="needToPickNewPresident && this.user.office === 'President'" :disabled="nominee === null" @click="makePresident()">SELECT AS PRESIDENT</v-btn>
-          <v-btn outlined v-if="vetoUnlocked && this.user.office === 'Chancellor'" :disabled="nominee === null" @click="veto()">CALL FOR VETO</v-btn>
+          <v-btn outlined v-if="vetoUnlocked && this.user.office === 'Chancellor'" @click="veto()">CALL FOR VETO</v-btn>
         </v-card-actions>
     </div>
   </v-card>
@@ -38,7 +38,8 @@ export default {
   data() {
     return {
       chancellorNomineeCrowdIndex: null,
-      didFailGovernment: false
+      didFailGovernment: false,
+      nextPresidentUserId: ''
     }
   },
   computed: {
@@ -55,6 +56,7 @@ export default {
       needToPeekCards: 'needToPeekCards',
       needToInvestigatePlayer: 'needToInvestigatePlayer',
       needToPickNewPresident: 'needToPickNewPresident',
+      nextPresidentPosition: 'nextPresidentPosition',
       previousGovernment: 'previousGovernment',
       president: 'president',
       vetoUnlocked: 'vetoUnlocked'
@@ -93,6 +95,11 @@ export default {
     }
   },
   methods: {
+    clearOffices () {
+      for (var x = 0; x < this.crowd.length; x++) {
+        this.crowd[x].office = 'None'
+      }
+    },
     vote(ballot) {
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.user.userId === this.crowd[x].userId) {
@@ -127,19 +134,38 @@ export default {
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousGovernment: previousGovernment, isGameOver: (this.crowd[this.chancellorNomineeCrowdIndex].isHitler && this.fascistBoard.length >= 3) })
     },
     changePresident (player) {
-      var lastPlayer = this.crowd.length - 1
+      this.hand = []
       var pres = null
+      var lastPlayer = this.crowd.length - 1
       if (this.chancellorNomineeCrowdIndex != null) {
         this.crowd[this.chancellorNomineeCrowdIndex].office = 'None'
       }
-      if (player != lastPlayer) {
+      if (this.nextPresidentPosition != -1) {
+        this.clearOffices()
+        for (let x = 0; x < this.crowd.length; x++) {
+          if (this.crowd[x].userId === this.nextPresidentUserId) {
+            this.crowd[x].office = 'President'
+            pres = x
+            this.$store.commit('setNextPresidentPosition', {
+              NextPresidentPosition: -1
+            })
+            this.$store.commit('setNeedToPickNewPresident', {
+              NeedToPickNewPresident: false
+            })
+            break
+          }
+        }
+        this.nextPresidentUserId = ''
+      } else {
+        if (player != lastPlayer) {
           this.crowd[player].office = 'None'
           this.crowd[player + 1].office = 'President'
           pres = player + 1
-      } else {
+        } else {
           this.crowd[player].office = 'None'
           this.crowd[0].office = 'President'
           pres = 0
+        }
       }
 
       var totalFailedGovernments
@@ -198,6 +224,12 @@ export default {
       })
       var crowdIndex = this.getOffice('Sentenced')
       let player = this.crowd[crowdIndex]
+      if (this.nextPresidentPosition != -1) {
+        if (crowdIndex === this.nextPresidentPosition) {
+          this.nextPresidentPosition = this.nextPresidentPosition === this.crowd.length - 1 ? 0 : this.nextPresidentPosition + 1
+        }
+        this.nextPresidentUserId = this.crowd[this.nextPresidentPosition].userId
+      }
       if (player.office === 'Sentenced') {
         player.office = 'None'
         this.graveyard.push(this.crowd[crowdIndex])
