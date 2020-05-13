@@ -226,9 +226,10 @@ export default {
       let player = this.crowd[crowdIndex]
       if (this.nextPresidentPosition != -1) {
         if (crowdIndex === this.nextPresidentPosition) {
-          this.nextPresidentPosition = this.nextPresidentPosition === this.crowd.length - 1 ? 0 : this.nextPresidentPosition + 1
+          this.nextPresidentUserId = this.crowd[this.nextPresidentPosition === this.crowd.length - 1 ? 0 : this.nextPresidentPosition + 1].userId
+        } else {
+          this.nextPresidentUserId = this.crowd[this.nextPresidentPosition].userId
         }
-        this.nextPresidentUserId = this.crowd[this.nextPresidentPosition].userId
       }
       if (player.office === 'Sentenced') {
         player.office = 'None'
