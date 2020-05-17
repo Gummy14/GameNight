@@ -7,27 +7,48 @@
         <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player)">
           <div v-if="user.office === 'President' && player.office != 'President'">
             <div v-if="!needToKillPlayer && !needToInvestigatePlayer && !needToPickNewPresident">
-              <v-list-item  v-if="previousGovernment.length === 2 && player.userId != previousGovernment[0] && player.userId != previousGovernment[1]" @click="nominate(index, 'Chancellor Nominee')"> 
+              <v-list-item  v-if="previousGovernment.length === 2 && player.userId != previousGovernment[0] && player.userId != previousGovernment[1]" @click="nominate(index, 'Chancellor Nominee')">
+                <v-list-item-icon v-if="player.vote != null">
+                  <v-icon>{{ checkedBox }}</v-icon>
+                </v-list-item-icon>
                 {{ player.username }}
               </v-list-item>
-              <v-list-item  v-else-if="previousGovernment.length === 2 && player.userId === previousGovernment[0] || player.userId === previousGovernment[1]"> 
+              <v-list-item  v-else-if="previousGovernment.length === 2 && player.userId === previousGovernment[0] || player.userId === previousGovernment[1]">
+                <v-list-item-icon v-if="player.vote != null">
+                  <v-icon>{{ checkedBox }}</v-icon>
+                </v-list-item-icon> 
                 {{ player.username }}
               </v-list-item>
               <v-list-item v-else-if="previousGovernment.length === 0" @click="nominate(index, 'Chancellor Nominee')">
+                <v-list-item-icon v-if="player.vote != null">
+                  <v-icon>{{ checkedBox }}</v-icon>
+                </v-list-item-icon>
                 {{ player.username }}
               </v-list-item>
             </div>
             <v-list-item v-else-if="needToKillPlayer" @click="nominate(index, 'Sentenced')"> 
+              <v-list-item-icon v-if="player.vote != null">
+                <v-icon>{{ checkedBox }}</v-icon>
+              </v-list-item-icon>
               {{ player.username }}
             </v-list-item>
-            <v-list-item v-else-if="needToInvestigatePlayer" @click="nominate(index, 'Under Investigation')"> 
+            <v-list-item v-else-if="needToInvestigatePlayer" @click="nominate(index, 'Under Investigation')">
+              <v-list-item-icon v-if="player.vote != null">
+                <v-icon>{{ checkedBox }}</v-icon>
+              </v-list-item-icon>
               {{ player.username }}
             </v-list-item>
-            <v-list-item v-else-if="needToPickNewPresident" @click="nominate(index, 'New President')"> 
+            <v-list-item v-else-if="needToPickNewPresident" @click="nominate(index, 'New President')">
+              <v-list-item-icon v-if="player.vote != null">
+                <v-icon>{{ checkedBox }}</v-icon>
+              </v-list-item-icon> 
               {{ player.username }}
             </v-list-item>
           </div>
-          <v-list-item v-else> 
+          <v-list-item v-else>
+            <v-list-item-icon v-if="player.vote != null">
+              <v-icon>{{ checkedBox }}</v-icon>
+            </v-list-item-icon>
             {{ player.username }}
           </v-list-item>
           <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
@@ -39,8 +60,14 @@
 <script>
 import firebase from 'firebase'
 import { mapState } from 'vuex'
+import { mdiCheckboxMarkedOutline } from '@mdi/js';
 export default {
   name: 'player-list',
+  data() {
+    return {
+      checkedBox: mdiCheckboxMarkedOutline
+    }
+  },
   computed: {
     ...mapState({ 
       crowd: 'crowd',
@@ -115,6 +142,13 @@ export default {
       this.crowd[nominee].office = nomination
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: this.crowd[nominee] })
     },
+    clearNominees () {
+      for (let x=0; x < this.crowd.length; x++) {
+        if (this.crowd[x].office != 'President') {
+          this.crowd[x].office = 'None'
+        }
+      }
+    }
   }
 }
 </script>
@@ -127,5 +161,65 @@ export default {
 }
 .space {
   padding-left: 15px;
+}
+.president {
+  background: rebeccapurple;
+}
+.chancellor {
+  background: #5a8bb9;
+}
+.sentenced {
+  background: yellow;
+}
+.chancellor-nominee {
+  background: #a4b3c1;
+}
+.under-investigation {
+  background: #2aff4e;
+}
+.new-president {
+  background: #7a589c;
+}
+.fascist-player {
+  background: #fc5f4a;
+}
+.fascist-player-president {
+  background: linear-gradient(to right, #fc5f4a 0%, rebeccapurple 100%);
+}
+.fascist-player-chancellor {
+  background: linear-gradient(to right, #fc5f4a 0%, #5a8bb9 100%);
+}
+.fascist-player-sentenced {
+  background: linear-gradient(to right, #fc5f4a 0%, yellow 100%);
+}
+.fascist-player-chancellor-nominee {
+  background: linear-gradient(to right, #fc5f4a 0%, #a4b3c1 100%);
+}
+.fascist-player-under-investigation {
+  background: linear-gradient(to right, #fc5f4a 0%, #2aff4e 100%);
+}
+.fascist-player-new-president {
+  background: linear-gradient(to right, #fc5f4a 0%, #7a589c 100%);
+}
+.hitler {
+  background: #a6120f;
+}
+.hitler-president {
+  background: linear-gradient(to right, #a6120f 0%, rebeccapurple 100%);
+}
+.hitler-chancellor {
+  background: linear-gradient(to right, #a6120f 0%, #5a8bb9 100%);
+}
+.hitler-sentenced {
+  background: linear-gradient(to right, #a6120f 0%, yellow 100%);
+}
+.hitler-chancellor-nominee {
+  background: linear-gradient(to right, #a6120f 0%, #a4b3c1 100%);
+}
+.hitler-under-investigation {
+  background: linear-gradient(to right, #a6120f 0%, #2aff4e 100%);
+}
+.hitler-new-president {
+  background: linear-gradient(to right, #a6120f 0%, #7a589c 100%);
 }
 </style>
