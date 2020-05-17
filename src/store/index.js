@@ -25,7 +25,8 @@ export default new Vuex.Store({
     vetoUnlocked: false,
     callingForVeto: false,
     presidentialVetoVote: null,
-    isGameOver: false
+    isGameOver: false,
+    discard: []
   },
   mutations: {
     setUser (state, payload) {
@@ -91,6 +92,9 @@ export default new Vuex.Store({
     setIsGameOver (state, payload) {
       state.isGameOver = payload.IsGameOver
     },
+    setDiscard (state, payload) {
+      state.discard = payload.Discard
+    },
     resetPresidentialPowers (state) {
       state.needToKillPlayer = false,
       state.needToPeekCards = false,
@@ -118,7 +122,8 @@ export default new Vuex.Store({
       state.vetoUnlocked = false,
       state.callingForVeto = false,
       state.presidentialVetoVote = null,
-      state.isGameOver = false
+      state.isGameOver = false,
+      state.discard = []
     }
   },
   actions: {
@@ -186,6 +191,9 @@ export default new Vuex.Store({
     },
     getIsGameOver (state) {
       return state.isGameOver
+    },
+    getDiscard (state) {
+      return state.discard
     }
   }
 })

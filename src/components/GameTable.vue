@@ -247,7 +247,6 @@ export default {
       ],
       peekDeck: [],
       hand: [],
-      discard: [],
       hasDiscarded: false,
       setUpDoc: {
         crowd: [],
@@ -266,6 +265,7 @@ export default {
         callingForVeto: false,
         presidentialVetoVote: null,
         isGameOver: false,
+        discard: []
       },
       isInvestigationOver: false,
       investigationResults: null,
@@ -292,7 +292,8 @@ export default {
       nextPresidentPosition: 'nextPresidentPosition',
       previousGovernment: 'previousGovernment',
       callingForVeto: 'callingForVeto',
-      isGameOver: 'isGameOver'
+      isGameOver: 'isGameOver',
+      discard: 'discard'
     })
   },
   mounted () {
@@ -414,6 +415,10 @@ export default {
         PresidentialVetoVote: doc.data().presidentialVetoVote
       })
 
+      self.$store.commit('setDiscard', {
+        Discard: doc.data().discard
+      })
+
       self.$store.commit('setIsGameOver', {
         IsGameOver: doc.data().isGameOver
       })
@@ -490,7 +495,8 @@ export default {
       this.clearOffices()
       this.assignRoles()
       this.pickPresident(pick)
-      this.setUpDoc.deck = this.randomizeDeck()
+      this.setUpDoc.deck = this.randomizeDeck(this.defaultDeck)
+      this.setUpDoc.discard = []
       this.setUpDoc.policies = []
       this.setUpDoc.isGameOver = false
       this.showStartButton = false
@@ -503,7 +509,8 @@ export default {
       this.setUpDoc.crowd = this.clearGraveyard()
       this.clearOffices()
       this.clearParties()
-      this.setUpDoc.deck = this.randomizeDeck()
+      this.setUpDoc.deck = this.randomizeDeck(this.defaultDeck)
+      this.setUpDoc.discard = []
       this.setUpDoc.policies = []
       this.setUpDoc.isGameOver = false
       this.showStartButton = true
@@ -518,11 +525,8 @@ export default {
       firebase.firestore().collection('root').doc('game-room').update({ deck: this.deck })
     },
     restoreDeck () {
-      var deck = this.randomizeDeck()
-      firebase.firestore().collection('root').doc('game-room').update({ deck: deck })
-    },
-    clearPolicies () {
-      firebase.firestore().collection('root').doc('game-room').update({ policies: [] })
+      var deck = this.randomizeDeck(this.discard)
+      firebase.firestore().collection('root').doc('game-room').update({ deck: deck, discard: [] })
     },
     setUpGame () {
       firebase.firestore().collection('root').doc('game-room').set(this.setUpDoc)
@@ -561,14 +565,14 @@ export default {
       }
       this.hasDiscarded = false
     },
-    randomizeDeck () {
-      for (var i = this.defaultDeck.length - 1; i > 0; i--) {
+    randomizeDeck (deck) {
+      for (var i = deck.length - 1; i > 0; i--) {
         var pick = Math.floor(Math.random() * (i + 1))
-        var temp = this.defaultDeck[i]
-        this.defaultDeck[i] = this.defaultDeck[pick]
-        this.defaultDeck[pick] = temp
+        var temp = deck[i]
+        deck[i] = deck[pick]
+        deck[pick] = temp
       }
-      return this.defaultDeck
+      return deck
     },
     nominate(nominee, nomination) {
       this.clearNominees()
@@ -748,8 +752,10 @@ export default {
     },
     discardedPolicy() {
       this.hasDiscarded = true
-      if (this.user.office === 'Chancellor') {
-        this.clearPolicies()
+      if (this.user.office === 'President') {
+        firebase.firestore().collection('root').doc('game-room').update({ discard: this.discard })
+      } else if (this.user.office === 'Chancellor') {
+        firebase.firestore().collection('root').doc('game-room').update({ policies: [], discard: this.discard })
       }
     },
     movePresidentToNextPlayer () {
