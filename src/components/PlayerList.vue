@@ -53,17 +53,31 @@ export default {
     })
   },
   methods: {
-      applyOffice (player) {
+    applyOffice (player) {
       if (this.user.party === 'Fascist' && !this.user.isHitler) {
         return {
-          'president': player.office === 'President',
-          'chancellor': player.office === 'Chancellor',
-          'chancellor-nominee': player.office === 'Chancellor Nominee',
-          'sentenced': player.office === 'Sentenced',
-          'under-investigation': player.office === 'Under Investigation',
-          'new-president': player.office === 'New President',
-          'fascist-player': player.party === 'Fascist' && !player.isHitler,
-          'hitler' : player.isHitler
+          'president': player.office === 'President' && player.party != 'Fascist',
+          'chancellor': player.office === 'Chancellor' && player.party != 'Fascist',
+          'chancellor-nominee': player.office === 'Chancellor Nominee' && player.party != 'Fascist',
+          'sentenced': player.office === 'Sentenced' && player.party != 'Fascist',
+          'under-investigation': player.office === 'Under Investigation' && player.party != 'Fascist',
+          'new-president': player.office === 'New President' && player.party != 'Fascist',
+          
+          'fascist-player': player.party === 'Fascist' && !player.isHitler && player.office === 'None',
+          'fascist-player-president': player.party === 'Fascist' && !player.isHitler && player.office === 'President',
+          'fascist-player-chancellor': player.party === 'Fascist' && !player.isHitler && player.office === 'Chancellor',
+          'fascist-player-chancellor-nominee': player.party === 'Fascist' && !player.isHitler && player.office === 'Chancellor Nominee',
+          'fascist-player-sentenced': player.party === 'Fascist' && !player.isHitler && player.office === 'Sentenced',
+          'fascist-player-under-investigation': player.party === 'Fascist' && !player.isHitler && player.office === 'Under Investigation',
+          'fascist-player-new-president': player.party === 'Fascist' && !player.isHitler && player.office === 'New President',
+
+          'hitler' : player.isHitler,
+          'hitler-president': player.isHitler && player.office === 'President',
+          'hitler-chancellor': player.isHitler && player.office === 'Chancellor',
+          'hitler-chancellor-nominee': player.isHitler && player.office === 'Chancellor Nominee',
+          'hitler-sentenced': player.isHitler && player.office === 'Sentenced',
+          'hitler-under-investigation': player.isHitler && player.office === 'Under Investigation',
+          'hitler-new-president': player.isHitler && player.office === 'New President',
         }
       } else if (this.user.party === 'Fascist' && this.user.isHitler) {
         return {
@@ -73,7 +87,14 @@ export default {
           'sentenced': player.office === 'Sentenced',
           'under-investigation': player.office === 'Under Investigation',
           'new-president': player.office === 'New President',
-          'hitler' : player.isHitler
+          
+          'hitler' : player.isHitler,
+          'hitler-president': player.isHitler && player.office === 'President',
+          'hitler-chancellor': player.isHitler && player.office === 'Chancellor',
+          'hitler-chancellor-nominee': player.isHitler && player.office === 'Chancellor Nominee',
+          'hitler-sentenced': player.isHitler && player.office === 'Sentenced',
+          'hitler-under-investigation': player.isHitler && player.office === 'Under Investigation',
+          'hitler-new-president': player.isHitler && player.office === 'New President',
         }
       } else {
         return {
