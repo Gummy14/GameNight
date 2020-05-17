@@ -128,6 +128,9 @@ export default {
       }
     },
     makeNomineeChancellor() {
+      this.crowd.forEach(element => {
+        element.vote = null
+      })
       this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
       var previousGovernment = []
       previousGovernment.push(this.crowd[this.chancellorNomineeCrowdIndex].userId, this.president.userId)
@@ -175,6 +178,10 @@ export default {
         totalFailedGovernments = this.failedGovernmentCount
       }
       this.didFailGovernment = false
+
+      this.crowd.forEach(element => {
+        element.vote = null
+      })
 
       firebase.firestore().collection('root').doc('game-room').update({ 
         crowd: this.crowd, 

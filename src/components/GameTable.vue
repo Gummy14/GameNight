@@ -407,6 +407,9 @@ export default {
       this.hasDiscarded = false
       this.$store.commit('resetPresidentialPowers')
       this.setUpDoc.crowd = this.clearGraveyard()
+      this.setUpDoc.crowd.forEach(element => {
+        element.vote = null
+      })
       this.clearOffices()
       this.assignRoles()
       this.pickPresident(pick)
@@ -422,6 +425,9 @@ export default {
       this.hasDiscarded = false
       this.$store.commit('resetPresidentialPowers')
       this.setUpDoc.crowd = this.clearGraveyard()
+      this.setUpDoc.crowd.forEach(element => {
+        element.vote = null
+      })
       this.clearOffices()
       this.clearParties()
       this.setUpDoc.deck = this.randomizeDeck(this.defaultDeck)
@@ -489,13 +495,6 @@ export default {
       }
       return deck
     },
-    clearNominees () {
-      for (let x=0; x < this.crowd.length; x++) {
-        if (this.crowd[x].office != 'President') {
-          this.crowd[x].office = 'None'
-        }
-      }
-    },
     pickPresident (player) {
       if (player > 0) {
         this.crowd[player-1].office = 'None'
@@ -518,9 +517,6 @@ export default {
       })
 
       switch(this.crowd.length) {
-        // case 3:
-        //   roleSet = this.createRoleSet(roleSet, 2, 0)
-        //   break
         case 5:
           roleSet = this.createRoleSet(roleSet, 3, 1)
           break
@@ -714,66 +710,6 @@ export default {
 .liberal{
   background-image: url("../assets/liberal-card.png");
   background-size: 100%;
-}
-.president {
-  background: rebeccapurple;
-}
-.chancellor {
-  background: #5a8bb9;
-}
-.sentenced {
-  background: yellow;
-}
-.chancellor-nominee {
-  background: #a4b3c1;
-}
-.under-investigation {
-  background: #2aff4e;
-}
-.new-president {
-  background: #7a589c;
-}
-.fascist-player {
-  background: #fc5f4a;
-}
-.fascist-player-president {
-  background: linear-gradient(to right, #fc5f4a 0%, rebeccapurple 100%);
-}
-.fascist-player-chancellor {
-  background: linear-gradient(to right, #fc5f4a 0%, #5a8bb9 100%);
-}
-.fascist-player-sentenced {
-  background: linear-gradient(to right, #fc5f4a 0%, yellow 100%);
-}
-.fascist-player-chancellor-nominee {
-  background: linear-gradient(to right, #fc5f4a 0%, #a4b3c1 100%);
-}
-.fascist-player-under-investigation {
-  background: linear-gradient(to right, #fc5f4a 0%, #2aff4e 100%);
-}
-.fascist-player-new-president {
-  background: linear-gradient(to right, #fc5f4a 0%, #7a589c 100%);
-}
-.hitler {
-  background: #a6120f;
-}
-.hitler-president {
-  background: linear-gradient(to right, #a6120f 0%, rebeccapurple 100%);
-}
-.hitler-chancellor {
-  background: linear-gradient(to right, #a6120f 0%, #5a8bb9 100%);
-}
-.hitler-sentenced {
-  background: linear-gradient(to right, #a6120f 0%, yellow 100%);
-}
-.hitler-chancellor-nominee {
-  background: linear-gradient(to right, #a6120f 0%, #a4b3c1 100%);
-}
-.hitler-under-investigation {
-  background: linear-gradient(to right, #a6120f 0%, #2aff4e 100%);
-}
-.hitler-new-president {
-  background: linear-gradient(to right, #a6120f 0%, #7a589c 100%);
 }
 .fascist-board {
   height: 125px;
