@@ -3,17 +3,10 @@
     <div class="field">
       <v-text-field 
         solo-inverted
-        label="Email"
-        v-model="email"
+        label="Name"
+        v-model="name"
       ></v-text-field>
-      <v-text-field 
-        solo-inverted
-        label="Password"
-        type="password"
-        v-model="password"
-      ></v-text-field>
-      <v-btn @click="login" class="login-btn">Login</v-btn>
-      <router-link to="/sign-up">Sign Up</router-link>
+      <v-btn @click="join" class="login-btn">Join Game!</v-btn>
     </div>
   </v-card>
 </template>
@@ -24,47 +17,35 @@ import firebase from 'firebase'
     name: 'log-in',
     data () {
     return {
-      email: '',
-      password: ''
+      name: ''
     }
   },
     methods: {
-      login () {
+      join () {
         var db = firebase.firestore()
         var self = this
-        firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
-          function () {
-            var currentUser = firebase.auth().currentUser
-
-            var user = {
-              username: currentUser.displayName,
-              userId: currentUser.uid,
-              email: currentUser.email,
-              isHitler: false,
-              party: 'None',
-              office: 'None'
-            }
-
-            self.$store.commit('setUser', {
-              User: user
-            })
-
-            db.collection('root').doc('game-room').get().then((doc) => {
-              var crowd = doc.data().crowd
-              crowd.push(user)
-              self.$store.commit('setCrowd', {
-                Crowd: crowd
-              })
-              db.collection('root').doc('game-room').update({ crowd: crowd })
-            })
-            .then(() => {
-              self.$router.replace('/game-table')
-            })
-          },
-          function (error) {
-            alert('Failed to Log In!' + error.message)
-          }
-        )
+        var user = {
+          username: this.name,
+          userId: "test-id",
+          isHitler: false,
+          party: 'None',
+          office: 'None'
+        }
+        this.$store.commit('setUser', {
+          User: user
+        })
+        localStorage.setItem('user', JSON.stringify(user))
+        db.collection('root').doc('game-room').get().then((doc) => {
+          var crowd = doc.data().crowd
+          crowd.push(user)
+          self.$store.commit('setCrowd', {
+            Crowd: crowd
+          })
+          db.collection('root').doc('game-room').update({ crowd: crowd })
+        })
+        .then(() => {
+          self.$router.replace('/game-table')
+        })
       }
     }
   }
