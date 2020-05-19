@@ -102,7 +102,7 @@ export default new Vuex.Store({
       state.needToPickNewPresident = false
     },
     clearStore (state) {
-      state.user = undefined,
+      state.user = null,
       state.crowd = [],
       state.fascistBoard = [],
       state.liberalBoard = [],

@@ -27,8 +27,6 @@ import firebase from 'firebase'
         firebase.auth().signInAnonymously().then(
           function () {
             var currentUser = firebase.auth().currentUser
-            firebase.
-
             currentUser.updateProfile({
               displayName: self.name,
             })

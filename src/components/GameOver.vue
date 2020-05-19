@@ -5,7 +5,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>  
       <v-btn @click="emitNewGame">New Game</v-btn>
-      <v-btn @click="emitEndGame">End Game</v-btn> 
+      <v-btn @click="emitLeaveGame">Leave Game</v-btn> 
     </v-card-actions>
   </v-card>
 </template>
@@ -45,7 +45,7 @@ export default {
           description: 'Hitler has died! \nThe fascists are now aimless without their leader.'
         }
         return outcome
-      } else if (this.chancellor.isHitler) {
+      } else if (this.chancellor?.isHitler) {
         outcome = {
           victoryType: 'Hitler has been elected Chancellor!',
           description: 'So this is how liberty dies... with thunderous applause. A sad day for democracy.'
@@ -54,8 +54,8 @@ export default {
       }
         else {
         outcome = {
-          victoryType: '',
-          description: ''
+          victoryType: 'GAME OVER',
+          description: 'GAME OVER'
         }
         return outcome
       }
@@ -73,8 +73,8 @@ export default {
     emitNewGame() {
       this.$emit('newGame')
     },
-    emitEndGame() {
-      this.$emit('endGame')
+    emitLeaveGame() {
+      this.$emit('leaveGame')
     }
   }
 }

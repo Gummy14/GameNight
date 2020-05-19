@@ -157,7 +157,7 @@
       </div>
 
       <v-dialog v-model="isGameOver" persistent max-width="290">
-        <game-over @newGame="startGame" @endGame="endGame">
+        <game-over @newGame="startGame" @leaveGame="leaveGame">
         </game-over>
       </v-dialog>
 
@@ -238,7 +238,8 @@ export default {
       },
       isInvestigationOver: false,
       investigationResults: null,
-      showStartButton: true
+      showStartButton: true,
+      snapshot: null
     };
   },
   computed: {
@@ -267,7 +268,8 @@ export default {
   },
   mounted () {
     var self = this
-    firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
+    this.snapshot = firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
+      console.log('HERE')
       self.$store.commit('setCrowd', {
         Crowd: doc.data().crowd
       })
@@ -420,22 +422,25 @@ export default {
       this.showStartButton = false
       this.setUpGame()
     },
-    endGame () {
-      this.hand = []
-      this.hasDiscarded = false
-      this.$store.commit('resetPresidentialPowers')
-      this.setUpDoc.crowd = this.clearGraveyard()
-      this.setUpDoc.crowd.forEach(element => {
-        element.vote = null
+    leaveGame () {
+      var self = this
+      this.snapshot()
+      for (let x = 0; x < this.crowd.length; x++) {
+        console.log('USER', this.user)
+        console.log('CROWD', this.crowd)
+        if(this.user.userId === this.crowd[x].userId) {
+          this.crowd.splice(x,1)
+          break
+        }
+      }
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
+      firebase.auth().signOut()
+      .then(function() {
+        self.$store.commit('clearStore')
+        self.$router.replace('/login')
+      }).catch(function(error) {
+        alert('Failed to leave game!' + error.message)
       })
-      this.clearOffices()
-      this.clearParties()
-      this.setUpDoc.deck = this.randomizeDeck(this.defaultDeck)
-      this.setUpDoc.discard = []
-      this.setUpDoc.policies = []
-      this.setUpDoc.isGameOver = false
-      this.showStartButton = true
-      this.setUpGame()
     },
     addPolicy () {
       var policiesToHandOff = this.hand
