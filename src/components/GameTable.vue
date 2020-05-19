@@ -424,15 +424,13 @@ export default {
     },
     leaveGame () {
       var self = this
-      this.snapshot()
       for (let x = 0; x < this.crowd.length; x++) {
-        console.log('USER', this.user)
-        console.log('CROWD', this.crowd)
         if(this.user.userId === this.crowd[x].userId) {
           this.crowd.splice(x,1)
           break
         }
       }
+      this.snapshot()
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
       firebase.auth().signOut()
       .then(function() {
