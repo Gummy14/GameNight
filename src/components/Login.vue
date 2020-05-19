@@ -24,28 +24,42 @@ import firebase from 'firebase'
       join () {
         var db = firebase.firestore()
         var self = this
-        var user = {
-          username: this.name,
-          userId: "test-id",
-          isHitler: false,
-          party: 'None',
-          office: 'None'
-        }
-        this.$store.commit('setUser', {
-          User: user
-        })
-        localStorage.setItem('user', JSON.stringify(user))
-        db.collection('root').doc('game-room').get().then((doc) => {
-          var crowd = doc.data().crowd
-          crowd.push(user)
-          self.$store.commit('setCrowd', {
-            Crowd: crowd
-          })
-          db.collection('root').doc('game-room').update({ crowd: crowd })
-        })
-        .then(() => {
-          self.$router.replace('/game-table')
-        })
+        firebase.auth().signInAnonymously().then(
+          function () {
+            var currentUser = firebase.auth().currentUser
+            firebase.
+
+            currentUser.updateProfile({
+              displayName: self.name,
+            })
+            .then(function() {
+              var user = {
+                username: currentUser.displayName,
+                userId: currentUser.uid,
+                isHitler: false,
+                party: 'None',
+                office: 'None'
+              }
+              self.$store.commit('setUser', {
+                User: user
+              })
+              db.collection('root').doc('game-room').get().then((doc) => {
+                var crowd = doc.data().crowd
+                crowd.push(user)
+                self.$store.commit('setCrowd', {
+                  Crowd: crowd
+                })
+                db.collection('root').doc('game-room').update({ crowd: crowd })
+              })
+              .then(() => {
+                self.$router.replace('/game-table')
+              })
+            })
+          },
+          function (error) {
+            alert('Failed to join!' + error.message)
+          }
+        )
       }
     }
   }

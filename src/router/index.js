@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Login from '@/components/Login.vue'
 import GameTable from '@/components/GameTable.vue'
 import store from '../store/index.js'
+import firebase from 'firebase'
 
 Vue.use(VueRouter)
 
@@ -34,18 +35,22 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  var currentUser
-  if (localStorage.getItem('user')) {
-    currentUser = JSON.parse(localStorage.getItem('user'))
+  const currentUser = firebase.auth().currentUser
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  if(currentUser) {
+    var user = {
+      username: currentUser.displayName,
+      userId: currentUser.uid,
+      email: currentUser.email,
+      isHitler: false,
+      party: 'None',
+      office: 'None'
+    }
 
     store.commit('setUser', {
-      User: currentUser
+      User: user
     })
-
-  } else {
-    currentUser = null
   }
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
   if (requiresAuth && !currentUser) next('log-in')
   else if (!requiresAuth && currentUser) next('game-table')
