@@ -171,6 +171,27 @@
       </v-dialog>
 
     </div>
+    <v-footer
+      color="primary lighten-1"
+      padless
+      fixed
+    >
+      <v-row
+        justify="center"
+        no-gutters
+      >
+        <v-btn
+          v-for="player in crowd"
+          :key="player.userId"
+          color="white"
+          text
+          rounded
+          class="my-2"
+        >
+          {{ player.username }}
+        </v-btn>
+      </v-row> 
+    </v-footer>
   </div>
 </template>
 
