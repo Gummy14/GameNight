@@ -1,6 +1,37 @@
 <template>
   <div>
-    <v-card dark class="login">
+    <v-footer
+      color="#1e1e1e"
+      padless
+      fixed
+    >
+      <v-row
+        justify="center"
+        no-gutters
+      >
+        <v-col
+          md="auto"
+          justify="center"
+          v-for="player in crowd"
+          :key="player.userId"
+          color="white"
+          text
+          rounded
+          class="names"
+          @click="vote()"
+          >
+          <v-card
+            class="pa-2"
+            outlined
+            dark
+            tile
+          >
+          {{ player.username }}
+          </v-card>
+        </v-col>
+      </v-row> 
+    </v-footer>
+    <!-- <v-card dark class="login">
       <v-list>
         <v-subheader class="space">PLAYERS</v-subheader>
         <v-divider></v-divider>
@@ -54,7 +85,7 @@
           <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
         </div> 
       </v-list>
-    </v-card>
+    </v-card> -->
   </div>
 </template>
 <script>
@@ -161,6 +192,9 @@ export default {
 }
 .space {
   padding-left: 15px;
+}
+.names {
+  width: 200px;
 }
 .president {
   background: rebeccapurple;
