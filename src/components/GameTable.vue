@@ -5,7 +5,7 @@
     <div class="table">
       <div class="small-board">
         <v-card-title class="title">Policy Deck</v-card-title>
-        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office!='President' || hand.length === 3">
+        <draggable class="deck-stack" :list="deck" group="cards" @change="removePolicyFromDeck" :disabled="user.office != 'President' || hand.length === 3 || chancellor === null">
           <v-card
             dark
             class="deck back"
