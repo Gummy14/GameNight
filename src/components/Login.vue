@@ -5,6 +5,7 @@
         solo-inverted
         label="Name"
         v-model="name"
+        @keyup.enter="join"
       ></v-text-field>
       <v-btn @click="join" class="login-btn">Join Game!</v-btn>
     </div>
