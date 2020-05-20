@@ -269,7 +269,6 @@ export default {
   mounted () {
     var self = this
     this.snapshot = firebase.firestore().collection('root').doc('game-room').onSnapshot(function (doc) {
-      console.log('HERE')
       self.$store.commit('setCrowd', {
         Crowd: doc.data().crowd
       })
@@ -432,12 +431,14 @@ export default {
       }
       this.snapshot()
       firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd })
-      firebase.auth().signOut()
-      .then(function() {
-        self.$store.commit('clearStore')
-        self.$router.replace('/login')
-      }).catch(function(error) {
-        alert('Failed to leave game!' + error.message)
+      .then(function () {
+        firebase.auth().signOut()
+        .then(function() {
+          self.$store.commit('clearStore')
+          self.$router.replace('/login')
+        }).catch(function(error) {
+          alert('Failed to leave game!' + error.message)
+        })
       })
     },
     addPolicy () {

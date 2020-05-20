@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     applyOffice (player) {
-      if (this.user.party === 'Fascist' && !this.user.isHitler) {
+      if ((this.user.party === 'Fascist' && !this.user.isHitler) || (this.user.isHitler && this.crowd.length < 7)) {
         return {
           'president': player.office === 'President' && player.party != 'Fascist',
           'chancellor': player.office === 'Chancellor' && player.party != 'Fascist',
@@ -106,7 +106,7 @@ export default {
           'hitler-under-investigation': player.isHitler && player.office === 'Under Investigation',
           'hitler-new-president': player.isHitler && player.office === 'New President',
         }
-      } else if (this.user.party === 'Fascist' && this.user.isHitler) {
+      } else if (this.user.isHitler && this.crowd.length > 6) {
         return {
           'president': player.office === 'President',
           'chancellor': player.office === 'Chancellor',
