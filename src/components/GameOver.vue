@@ -23,7 +23,8 @@ export default {
       fascistBoard: 'fascistBoard',
       liberalBoard: 'liberalBoard',
       graveyard: 'graveyard',
-      chancellor: 'chancellor'
+      chancellor: 'chancellor',
+      president: 'president'
     }),
     gameWinner () {
         var outcome
@@ -40,9 +41,16 @@ export default {
         }
         return outcome
       } else if (this.isHitlerDead) {
-        outcome = {
-          victoryType: 'Hitler has been killed!',
-          description: 'Hitler has died! \nThe fascists are now aimless without their leader.'
+        if (this.president.party === 'Fascist') {
+          outcome = {            
+            victoryType: 'A fascist has killed Hitler!',
+            description: 'An incompetent fascist has, for some reason, killed their own leader\nThis act has single handily destroyed the fascist movement and secured a liberal victory.\n\nThanks Obama'
+          }
+        } else {
+          outcome = {
+            victoryType: 'Hitler has been killed!',
+            description: 'Hitler has died! \nThe fascists are now aimless without their leader.'
+          }
         }
         return outcome
       } else if (this.chancellor?.isHitler) {

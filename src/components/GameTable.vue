@@ -156,12 +156,12 @@
         </v-card>
       </div>
 
-      <v-dialog v-model="isGameOver" persistent max-width="290">
+      <v-dialog v-model="isGameOver" persistent max-width="375">
         <game-over @newGame="startGame" @leaveGame="leaveGame">
         </game-over>
       </v-dialog>
 
-      <v-dialog v-model="isInvestigationOver" persistent max-width="290">
+      <v-dialog v-model="isInvestigationOver" persistent max-width="375">
         <investigation-results :player="investigationResults" @investigationOver="setInvestigationResults(null, false)">
         </investigation-results>
       </v-dialog>

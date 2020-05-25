@@ -244,7 +244,7 @@ export default {
         this.crowd.splice(crowdIndex, 1)
       }
       if (player.isHitler) {
-        firebase.firestore().collection('root').doc('game-room').update({ isGameOver: true })
+        firebase.firestore().collection('root').doc('game-room').update({ isGameOver: true, graveyard: this.graveyard, crowd: this.crowd })
       } else {
         for (let x = 0; x < this.crowd.length; x++) {
           if (this.crowd[x].office === 'President') {
