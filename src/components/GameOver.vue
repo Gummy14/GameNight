@@ -1,7 +1,8 @@
 <template>
   <v-card dark>
     <v-card-title class="headline">{{ gameWinner.victoryType }}</v-card-title>  
-    <v-card-text>{{ gameWinner.description }}</v-card-text>  
+    <v-card-text>{{ gameWinner.description }}</v-card-text>
+    <v-card-text> {{ listOfFascists }}</v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>  
       <v-btn @click="emitNewGame">New Game</v-btn>
@@ -24,7 +25,8 @@ export default {
       liberalBoard: 'liberalBoard',
       graveyard: 'graveyard',
       chancellor: 'chancellor',
-      president: 'president'
+      president: 'president',
+      crowd: 'crowd'
     }),
     gameWinner () {
         var outcome
@@ -75,6 +77,52 @@ export default {
         }
       }
       return false
+    },
+    listOfFascists () {
+      var deadplayers = this.graveyard
+      var players = this.crowd
+
+      if (deadplayers.length > 0) {
+        players.concat(deadplayers)
+      }
+
+      var fascists = 'The fascists were:'
+      var fascistCount = 0
+      switch (players.length)
+      {
+        case 5:
+          fascistCount = 2
+          break
+        case 6:
+          fascistCount = 2
+          break
+        case 7:
+          fascistCount = 3
+          break
+        case 8:
+          fascistCount = 3
+          break
+        case 9:
+          fascistCount = 4
+          break
+        case 10:
+          fascistCount = 4
+          break
+      }
+
+      var identifiedFascists = 0
+      for (let q = 0; q < players.length; q++) {
+        if (players[q].party === 'Fascist') {
+          identifiedFascists++
+          if (identifiedFascists < fascistCount) {
+            fascists = fascists + ' ' + players[q].username + ','
+          } else {
+            fascists = fascists + ' ' + players[q].username
+          }
+        }
+      }
+
+      return fascists
     }
   },
   methods: {
