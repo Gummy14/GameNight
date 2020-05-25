@@ -1,91 +1,116 @@
 <template>
   <div>
-    <v-footer
-      color="#1e1e1e"
-      padless
-      fixed
-    >
-      <v-row
-        justify="center"
-        no-gutters
-      >
+    <v-footer color="#1e1e1e" padless fixed>
+      <v-row justify="center" no-gutters>
         <v-col
-          md="auto"
           justify="center"
-          v-for="player in crowd"
-          :key="player.userId"
+          v-for="(player, index) in crowd"
+          :key="index"
           color="white"
-          text
-          rounded
           class="names"
           @click="vote()"
           >
+          <div v-if="user.office === 'President' && player.office != 'President'">
+            <div v-if="!needToKillPlayer && !needToInvestigatePlayer && !needToPickNewPresident">
+
+              <v-card
+                v-if="previousGovernment.length === 2 && player.userId != previousGovernment[0] && player.userId != previousGovernment[1]" 
+                @click="nominate(index, 'Chancellor Nominee')"
+                :class="applyOffice(player)"
+                class="pa-2 cardhover "
+                dark
+                outlined
+                hover
+                >
+                <div class="text-center">
+                  {{ player.username }}
+                </div>
+              </v-card>
+
+              <v-card
+                v-else-if="previousGovernment.length === 2 && player.userId === previousGovernment[0] || player.userId === previousGovernment[1]" 
+                :class="applyOffice(player)"
+                class="pa-2 cardhover "
+                dark
+                outlined
+                hover
+                >
+                <div class="text-center">
+                  {{ player.username }}
+                </div>
+              </v-card>
+
+              <v-card
+                v-else-if="previousGovernment.length === 0"
+                @click="nominate(index, 'Chancellor Nominee')"
+                :class="applyOffice(player)"
+                class="pa-2 cardhover "
+                dark
+                outlined
+                hover
+                >
+                <div class="text-center">
+                  {{ player.username }}
+                </div>
+              </v-card>
+            </div>
+            <v-card
+              v-else-if="needToKillPlayer"
+              @click="nominate(index, 'Sentenced')"
+              :class="applyOffice(player)"
+              class="pa-2 cardhover "
+              dark
+              outlined
+              hover
+              >
+              <div class="text-center">
+                {{ player.username }}
+              </div>
+            </v-card>
+
+            <v-card
+              v-else-if="needToInvestigatePlayer"
+              @click="nominate(index, 'Under Investigation')"
+              :class="applyOffice(player)"
+              class="pa-2 cardhover "
+              dark
+              outlined
+              hover
+              >
+              <div class="text-center">
+                {{ player.username }}
+              </div>
+            </v-card>
+
+            <v-card
+              v-else-if="needToPickNewPresident"
+              @click="nominate(index, 'New President')"
+              :class="applyOffice(player)"
+              class="pa-2 cardhover "
+              dark
+              outlined
+              hover
+              >
+              <div class="text-center">
+                {{ player.username }}
+              </div>
+            </v-card>
+          </div>
           <v-card
-            class="pa-2"
-            outlined
+            v-else
+            :class="applyOffice(player)"
+            class="pa-2 cardhover "
             dark
-            tile
-          >
-          {{ player.username }}
+            outlined
+            hover
+            >
+            <div class="text-center">
+              {{ player.username }}
+            </div>
           </v-card>
         </v-col>
       </v-row> 
     </v-footer>
-    <!-- <v-card dark class="login">
-      <v-list>
-        <v-subheader class="space">PLAYERS</v-subheader>
-        <v-divider></v-divider>
-        <div v-for="(player, index) in crowd" :key="index" :class="applyOffice(player)">
-          <div v-if="user.office === 'President' && player.office != 'President'">
-            <div v-if="!needToKillPlayer && !needToInvestigatePlayer && !needToPickNewPresident">
-              <v-list-item  v-if="previousGovernment.length === 2 && player.userId != previousGovernment[0] && player.userId != previousGovernment[1]" @click="nominate(index, 'Chancellor Nominee')">
-                <v-list-item-icon v-if="player.vote != null">
-                  <v-icon>{{ checkedBox }}</v-icon>
-                </v-list-item-icon>
-                {{ player.username }}
-              </v-list-item>
-              <v-list-item  v-else-if="previousGovernment.length === 2 && player.userId === previousGovernment[0] || player.userId === previousGovernment[1]">
-                <v-list-item-icon v-if="player.vote != null">
-                  <v-icon>{{ checkedBox }}</v-icon>
-                </v-list-item-icon> 
-                {{ player.username }}
-              </v-list-item>
-              <v-list-item v-else-if="previousGovernment.length === 0" @click="nominate(index, 'Chancellor Nominee')">
-                <v-list-item-icon v-if="player.vote != null">
-                  <v-icon>{{ checkedBox }}</v-icon>
-                </v-list-item-icon>
-                {{ player.username }}
-              </v-list-item>
-            </div>
-            <v-list-item v-else-if="needToKillPlayer" @click="nominate(index, 'Sentenced')"> 
-              <v-list-item-icon v-if="player.vote != null">
-                <v-icon>{{ checkedBox }}</v-icon>
-              </v-list-item-icon>
-              {{ player.username }}
-            </v-list-item>
-            <v-list-item v-else-if="needToInvestigatePlayer" @click="nominate(index, 'Under Investigation')">
-              <v-list-item-icon v-if="player.vote != null">
-                <v-icon>{{ checkedBox }}</v-icon>
-              </v-list-item-icon>
-              {{ player.username }}
-            </v-list-item>
-            <v-list-item v-else-if="needToPickNewPresident" @click="nominate(index, 'New President')">
-              <v-list-item-icon v-if="player.vote != null">
-                <v-icon>{{ checkedBox }}</v-icon>
-              </v-list-item-icon> 
-              {{ player.username }}
-            </v-list-item>
-          </div>
-          <v-list-item v-else>
-            <v-list-item-icon v-if="player.vote != null">
-              <v-icon>{{ checkedBox }}</v-icon>
-            </v-list-item-icon>
-            {{ player.username }}
-          </v-list-item>
-          <v-divider v-if="index + 1 < crowd.length" :key="index"></v-divider>
-        </div> 
-      </v-list>
-    </v-card> -->
   </div>
 </template>
 <script>
@@ -255,5 +280,9 @@ export default {
 }
 .hitler-new-president {
   background: linear-gradient(to right, #a6120f 0%, #7a589c 100%);
+}
+.cardhover:hover {
+  background: white;
+  color: black;
 }
 </style>
