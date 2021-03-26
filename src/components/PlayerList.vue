@@ -24,6 +24,7 @@
                 >
                 <div class="text-center">
                   {{ player.username }}
+                  <v-icon v-if="player.vote != null">{{ checkedBox }}</v-icon>
                 </div>
               </v-card>
 
@@ -37,6 +38,7 @@
                 >
                 <div class="text-center">
                   {{ player.username }}
+                  <v-icon v-if="player.vote != null">{{ checkedBox }}</v-icon>
                 </div>
               </v-card>
 
@@ -51,6 +53,7 @@
                 >
                 <div class="text-center">
                   {{ player.username }}
+                  <v-icon v-if="player.vote != null">{{ checkedBox }}</v-icon>
                 </div>
               </v-card>
             </div>
@@ -65,6 +68,7 @@
               >
               <div class="text-center">
                 {{ player.username }}
+                <v-icon v-if="player.vote != null">{{ checkedBox }}</v-icon>
               </div>
             </v-card>
 
@@ -79,6 +83,7 @@
               >
               <div class="text-center">
                 {{ player.username }}
+                <v-icon v-if="player.vote != null">{{ checkedBox }}</v-icon>
               </div>
             </v-card>
 
@@ -93,6 +98,7 @@
               >
               <div class="text-center">
                 {{ player.username }}
+                <v-icon v-if="player.vote != null">{{ checkedBox }}</v-icon>
               </div>
             </v-card>
           </div>
@@ -106,6 +112,7 @@
             >
             <div class="text-center">
               {{ player.username }}
+              <v-icon v-if="player.vote != null">{{ checkedBox }}</v-icon>
             </div>
           </v-card>
         </v-col>
