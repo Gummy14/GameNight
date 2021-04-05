@@ -19,8 +19,8 @@
             ></v-list-item-avatar>
         </v-list-item>
         <v-card-actions>
-          <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(true)">Vote Ja!</v-btn>
-          <v-btn outlined :disabled="chancellorNominee === ''" @click="vote(false)">Vote Nein!</v-btn>
+          <v-btn :disabled="nominee === null || user.vote" @click="vote(true)">Vote Ja!</v-btn>
+          <v-btn :disabled="nominee === null || user.vote" @click="vote(false)">Vote Nein!</v-btn>
           <v-btn outlined v-if="needToKillPlayer && this.user.office === 'President'" :disabled="nominee === null" @click="killPlayer()">FINISH HIM</v-btn>
           <v-btn outlined v-if="needToInvestigatePlayer && this.user.office === 'President'" :disabled="nominee === null" @click="investigatePlayer()">INVESTIGATE HIM</v-btn>
           <v-btn outlined v-if="needToPickNewPresident && this.user.office === 'President'" :disabled="nominee === null" @click="makePresident()">SELECT AS PRESIDENT</v-btn>
@@ -37,7 +37,6 @@ export default {
   name: 'player-card',
   data() {
     return {
-      chancellorNomineeCrowdIndex: null,
       didFailGovernment: false,
       nextPresidentUserId: ''
     }
@@ -61,30 +60,14 @@ export default {
       president: 'president',
       vetoUnlocked: 'vetoUnlocked'
     }),
-    isHitler() {
+    isHitler () {
       if (this.user.isHitler === true) {
           return 'You ARE Hitler'
       } else {
           return 'You ARE NOT Hitler'
       }
     },
-    chancellorNominee () {
-      var doesChancellorNomineeExist = false
-      var chancellorNominee = ''
-      this.crowd.forEach((element, index) => {
-        if (element.office === 'Chancellor Nominee') {
-          doesChancellorNomineeExist = true
-          chancellorNominee = element.username
-          this.chancellorNomineeCrowdIndex = index
-        }
-      })
-      if (doesChancellorNomineeExist === false) {
-        return ''
-      } else {
-        return chancellorNominee
-      }
-    },
-    isElectionComplete() {
+    isElectionComplete () {
       var didEveryoneVote = true
       for (let x = 0; x < this.crowd.length; x++) {
         if (this.crowd[x].vote === null) {
@@ -131,17 +114,17 @@ export default {
       this.crowd.forEach(element => {
         element.vote = null
       })
-      this.crowd[this.chancellorNomineeCrowdIndex].office = 'Chancellor'
+      this.crowd[this.nominee.index].office = 'Chancellor'
       var previousGovernment = []
-      previousGovernment.push(this.crowd[this.chancellorNomineeCrowdIndex].userId, this.president.userId)
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: this.crowd[this.chancellorNomineeCrowdIndex], failedGovernmentCount: 0, previousGovernment: previousGovernment, isGameOver: (this.crowd[this.chancellorNomineeCrowdIndex].isHitler && this.fascistBoard.length >= 3) })
+      previousGovernment.push(this.crowd[this.nominee.index].userId, this.president.userId)
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: null, chancellor: this.crowd[this.nominee.index], failedGovernmentCount: 0, previousGovernment: previousGovernment, isGameOver: (this.crowd[this.nominee.index].isHitler && this.fascistBoard.length >= 3) })
     },
     changePresident (player) {
       this.hand = []
       var pres = null
       var lastPlayer = this.crowd.length - 1
-      if (this.chancellorNomineeCrowdIndex != null) {
-        this.crowd[this.chancellorNomineeCrowdIndex].office = 'None'
+      if (this.nominee.index != null) {
+        this.crowd[this.nominee.index].office = 'None'
       }
       if (this.nextPresidentPosition != -1) {
         this.clearOffices()

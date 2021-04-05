@@ -8,9 +8,8 @@
           :key="index"
           color="white"
           class="names"
-          @click="vote()"
           >
-          <div v-if="user.office === 'President' && player.office != 'President'">
+          <div v-if="user.office === 'President' && player.office != 'President' && chancellor === null">
             <div v-if="!needToKillPlayer && !needToInvestigatePlayer && !needToPickNewPresident">
 
               <v-card
@@ -140,6 +139,7 @@ export default {
       needToInvestigatePlayer: 'needToInvestigatePlayer',
       needToPickNewPresident: 'needToPickNewPresident',
       previousGovernment: 'previousGovernment',
+      chancellor: 'chancellor'
     })
   },
   methods: {
@@ -197,13 +197,17 @@ export default {
         }
       }
     },
-    nominate(nominee, nomination) {
+    nominate(nomineeIndex, nomination) {
       this.clearNominees()
       this.crowd.forEach(element => {
         element.vote = null
       })
-      this.crowd[nominee].office = nomination
-      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: this.crowd[nominee] })
+      this.crowd[nomineeIndex].office = nomination
+      var nominee = {
+        player: this.crowd[nomineeIndex],
+        index: nomineeIndex
+      }
+      firebase.firestore().collection('root').doc('game-room').update({ crowd: this.crowd, nominee: nominee})
     },
     clearNominees () {
       for (let x=0; x < this.crowd.length; x++) {
